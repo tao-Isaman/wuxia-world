@@ -105,6 +105,12 @@ await check("the session joins with the hero's real position, throttles moves an
   sockets[0].fire("message", { t: "error", code: "too_fast", message: "" });
   assert.deepEqual(refused, ["too_fast"]);
   off();
+  // A refusal with no line said lately (a refused step) is not the chat's: no "typing too fast".
+  const realNow = Date.now;
+  Date.now = () => realNow() + 5000;
+  sockets[0].fire("message", { t: "error", code: "too_fast", message: "" });
+  Date.now = realNow;
+  assert.deepEqual(refused, ["too_fast"], "only the chat line's refusal reached the chat");
   // Looks: a change goes out as `look` (no rejoin); another's `looked` re-dresses them.
   session.setLook({ outfit: "sect_emei", weapon: "eq_t1_w_long" });
   assert.deepEqual(sockets[0].sent.at(-1), { t: "look", outfit: "sect_emei", weapon: "eq_t1_w_long" });
@@ -113,12 +119,20 @@ await check("the session joins with the hero's real position, throttles moves an
   assert.equal(sockets[0].sent.length, sentBefore, "the same look is not sent twice");
   sockets[0].fire("message", { t: "event", seq: 5, ev: { t: "looked", id: "bob", outfit: "tailor_ink", weapon: null, at: 2 } });
   assert.deepEqual(session.players("home_player").map((p) => [p.id, p.outfit, p.weapon]), [["bob", "tailor_ink", null]]);
+  // Placed far away on the same map (the arrival side after a scene change): a rejoin there, not a refused move.
+  const sentBeforeJump = sockets[0].sent.length;
+  session.report("home_player", { x: 900, y: 600, dir: "W", moving: false });
+  assert.equal(sockets[0].sent.length, sentBeforeJump, "no move the room would refuse");
+  assert.equal(sockets.length, 2);
+  assert.ok(sockets[1].url.includes("/rooms/home_player/"));
+  sockets[1].fire("open");
+  assert.deepEqual([(sockets[1].sent[0] as { x: number }).x, (sockets[1].sent[0] as { y: number }).y], [900, 600], "hello at the new spot");
   // A new map is a new room.
   session.report("city_capital", { x: 50, y: 60, dir: "N", moving: false });
-  assert.equal(sockets.length, 2);
-  assert.ok(sockets[1].url.includes("/rooms/city_capital/"));
-  sockets[1].fire("open");
-  assert.equal((sockets[1].sent[0] as { outfit: string }).outfit, "sect_emei", "a new room hears the look in hello");
+  assert.equal(sockets.length, 3);
+  assert.ok(sockets[2].url.includes("/rooms/city_capital/"));
+  sockets[2].fire("open");
+  assert.equal((sockets[2].sent[0] as { outfit: string }).outfit, "sect_emei", "a new room hears the look in hello");
   assert.equal(session.bubble("city_capital", "bob"), null, "a new room starts without bubbles");
   assert.equal(session.say("hi"), false, "not in the room yet");
   session.configure(null);

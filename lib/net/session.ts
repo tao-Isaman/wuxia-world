@@ -24,6 +24,16 @@ export const MOVE_INTERVAL_MS = 100;
 /** …and a standing hero re-sends nothing. A silent map closes the socket after this long. */
 export const IDLE_CLOSE_MS = 15_000;
 const PING_MS = 20_000;
+/**
+ * The room refuses a step longer than walking could make (server/core/src/room.rs
+ * WALK_SPEED × SPEED_SLACK per second + JUMP_SLACK). A hero placed somewhere
+ * else on the same map (the arrival side after a scene change, a warp) rejoins
+ * there instead of sending a move the room would refuse.
+ */
+const WALK_REACH_PER_S = 150 * 1.6 * 0.8;
+const JUMP_REACH = 40;
+/** A refusal within this long of a chat line is that line's (`too_fast`); others are not chat's (ms). */
+const SAY_ERROR_WINDOW_MS = 3000;
 const RETRY_MS = [1000, 2000, 4000, 8000, 15_000];
 
 export type OnlineStatus = "off" | "connecting" | "online" | "offline" | "replaced";
@@ -48,6 +58,8 @@ export class OnlineSession {
   private look: Look = { outfit: "default", weapon: null };
   private lastSent: Motion | null = null;
   private lastSentAt = 0;
+  /** When we last said a line on this map (a `too_fast` soon after is the chat's). */
+  private lastSayAt = 0;
   private lastReportAt = 0;
   private retry = 0;
   private retryTimer: ReturnType<typeof setTimeout> | null = null;
@@ -97,6 +109,16 @@ export class OnlineSession {
     const last = this.lastSent;
     const changed = !last || last.x !== motion.x || last.y !== motion.y || last.dir !== motion.dir || last.moving !== motion.moving;
     if (!changed) return;
+    // Placed far away on the same map (not walked there): rejoin at the new spot.
+    if (last) {
+      const reach = WALK_REACH_PER_S * Math.max(0, Date.now() - this.lastSentAt) / 1000 + JUMP_REACH;
+      if (Math.hypot(motion.x - last.x, motion.y - last.y) > reach) {
+        this.disconnect();
+        this.room = room;
+        this.open();
+        return;
+      }
+    }
     // Starting or stopping goes out at once; steps in between at MOVE_INTERVAL_MS.
     const urgent = !last || last.moving !== motion.moving;
     if (!urgent && Date.now() - this.lastSentAt < MOVE_INTERVAL_MS) return;
@@ -109,6 +131,7 @@ export class OnlineSession {
   say(text: string): boolean {
     if (!this.conn?.isOpen || this.presence.epoch === null) return false;
     this.conn.say(text);
+    this.lastSayAt = Date.now();
     return true;
   }
 
@@ -179,7 +202,8 @@ export class OnlineSession {
       onMessage: (message) => {
         if (conn !== this.conn) return;
         if (message.t === "error" && message.code === "replaced") { this.setStatus("replaced"); return; }
-        if (message.t === "error" && (message.code === "too_fast" || message.code === "bad_text")) {
+        // Only a refused chat line reaches the chat (a refused step is not "typing too fast").
+        if (message.t === "error" && (message.code === "too_fast" || message.code === "bad_text") && Date.now() - this.lastSayAt < SAY_ERROR_WINDOW_MS) {
           for (const listener of this.chatErrorListeners) listener(message.code);
         }
         if (message.t === "event" && message.ev.t === "said" && message.seq > Math.max(this.presence.seq, this.lastSaidSeq)) {
