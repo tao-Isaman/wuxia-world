@@ -474,8 +474,8 @@ check("decline and drop: every lineage / saga offer can be turned down, and an a
   assert.ok(isQuestOfferable(store(), def), `${def.id}: offered again after dropping`);
 });
 
-check("secret trials: the T4 saga trials are off the sect window and offered by their giver", () => {
-  for (const [reward, qid] of Object.entries(SAGA_PROLOGUES)) {
+check("secret trials: the T4 saga trials and T3 lineage trials are off the sect window and offered by their giver", () => {
+  for (const [reward, qid] of [...Object.entries(SAGA_PROLOGUES), ...Object.entries(LINEAGE_PROLOGUES)]) {
     const def = getQuest(qid);
     if (!def?.sectId) { err(`trial ${qid} (${reward}): not a sect quest`); continue; }
     if (!isSecretSectQuest(qid)) err(`trial ${qid}: not secret`);

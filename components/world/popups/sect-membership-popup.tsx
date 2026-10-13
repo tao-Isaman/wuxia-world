@@ -11,14 +11,13 @@ import {
   getQuestsForSect,
   isSectQuestOfferable,
   isQuestOfferable,
-  isSecretSectQuest,
   MYSTERY_MOVE_LABEL,
   describeQuestCondition,
   getNpc,
   getQuest,
   rankUpGold,
 } from "@/lib/world";
-import { sectLineageQuests, trialOpens } from "@/lib/world/story/registry";
+import { sectLineageQuests } from "@/lib/world/story/registry";
 import { REJOIN_COOLDOWN_DAYS, isRedemptionQuest, membershipStatus, rejoinWaitDays, redemptionQuestId } from "@/lib/world/sects";
 import { questHolder } from "@/lib/world/npc-life";
 import { MS_PER_DAY, msAtWorld } from "@/lib/world/clock";
@@ -31,12 +30,11 @@ interface Props {
   onClose: () => void;
 }
 
-type Tab = "rewards" | "quests" | "art";
+type Tab = "rewards" | "quests";
 
 const TAB_LABEL: Record<Tab, string> = {
   rewards: "🎖 ขั้นและวิชา",
   quests: "📜 ภารกิจประจำ",
-  art: "☯ ลมปราณ",
 };
 
 // Multi-tab sect popup. Sect picker (when player has more than one
@@ -98,11 +96,9 @@ export function SectMembershipPopup({ open, onClose }: Props) {
   const sectQuests = getQuestsForSect(current);
   // The redemption quest is asked for in person by a betrayer, never listed here.
   const repeatable = sectQuests.filter((q) => !q.isArtQuest && !isRedemptionQuest(q));
-  // The T4 saga trials stay secret: their giver offers them in person.
-  const artQuests = sectQuests.filter((q) => q.isArtQuest && !isSecretSectQuest(q.id));
   // Each tab's count, the same that adds up to the menu's สำนัก badge.
   const actions = sectActionsFor(worldState, current);
-  const tabCount: Record<Tab, number> = { rewards: actions.rankUp, quests: actions.quests, art: actions.art };
+  const tabCount: Record<Tab, number> = { rewards: actions.rankUp, quests: actions.quests };
 
   return (
     <Modal open={open} onClose={onClose} title={`🪷 ศิษย์${def.name}`} maxWidth="max-w-2xl">
@@ -154,7 +150,7 @@ export function SectMembershipPopup({ open, onClose }: Props) {
 
       {/* ─── Tabs ────────────────────────────────────────────────── */}
       <div className="flex gap-1 border-b border-border mb-3">
-        {(["rewards", "quests", "art"] as const).map((t) => (
+        {(["rewards", "quests"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -194,15 +190,6 @@ export function SectMembershipPopup({ open, onClose }: Props) {
           />
         )}
 
-        {tab === "art" && (
-          <ArtQuestsTab
-            quests={artQuests}
-            sectId={current}
-            artQuestsDone={m.artQuestsDone}
-            worldState={worldState}
-            onAccept={(qid) => acceptSectQuest(current, qid)}
-          />
-        )}
       </div>
 
       <FormerSects worldState={worldState} />
@@ -488,93 +475,3 @@ function QuestsTab({ quests, worldState, onAccept }: QuestsTabProps) {
 }
 
 // ─── Art quest tab ─────────────────────────────────────────────────
-interface ArtQuestsTabProps {
-  quests: QuestDef[];
-  sectId: SectId;
-  artQuestsDone: readonly string[];
-  worldState: import("@/lib/world").WorldStateData;
-  onAccept: (questId: string) => { ok: boolean; reason?: string };
-}
-
-/**
- * What a passed trial opened: its lineage quest, who gives it and how it
- * stands — a trial teaches nothing itself, so the window says where to go.
- */
-function trialNext(worldState: import("@/lib/world").WorldStateData, trialId: string): string {
-  const quest = getQuest(trialOpens(trialId) ?? "");
-  if (!quest) return "ผ่านบททดสอบแล้ว";
-  const giver = quest.giverNpcId ? getNpc(questHolder(worldState, quest.giverNpcId) ?? quest.giverNpcId)?.name : undefined;
-  const status = worldState.quests[quest.id]?.status;
-  if (status === "done") return `ผ่านแล้ว · ${quest.name} สำเร็จแล้ว`;
-  if (status === "active") return `ผ่านแล้ว · กำลังทำ ${quest.name}`;
-  if (isQuestOfferable(worldState, quest)) return `ผ่านแล้ว · ไปรับ ${quest.name} จาก ${giver ?? "—"}`;
-  const unmet = describeQuestCondition(worldState, quest.prereqs ?? { t: "and", all: [] }).filter((l) => !l.done && !l.negated);
-  return `ผ่านแล้ว · ${quest.name} (${giver ?? "—"}) ${unmet.length ? `ต้องการ ${unmet.map((l) => l.label).join(", ")}` : "ยังไม่ครบเงื่อนไข"}`;
-}
-
-function ArtQuestsTab({
-  quests,
-  artQuestsDone,
-  worldState,
-  onAccept,
-}: ArtQuestsTabProps) {
-  if (quests.length === 0) {
-    return <div className="text-xs text-muted-foreground">ยังไม่มีภารกิจลมปราณของสำนักนี้</div>;
-  }
-  return (
-    <div className="space-y-2">
-      <div className="text-xs text-muted-foreground">
-        ภารกิจหายาก — ทำได้ครั้งเดียว เพื่อรับลมปราณระดับสูง
-      </div>
-      {quests.map((q) => {
-        const status = isSectQuestOfferable(worldState, q);
-        const done = artQuestsDone.includes(q.id);
-        const active = worldState.quests[q.id]?.status === "active";
-        return (
-          <div
-            key={q.id}
-            className="border border-border bg-card/50 p-2 space-y-1"
-          >
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex-1">
-                <div className="text-sm font-bold">
-                  {q.name}{" "}
-                  {done && <span className="text-jade text-xs">✓ ผ่านแล้ว</span>}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {q.briefSummary ?? q.description}
-                </div>
-              </div>
-              <div className="text-[10px] text-right whitespace-nowrap">
-                {q.minSectRank != null && (
-                  <div className="text-muted-foreground">≤ ขั้น {q.minSectRank}</div>
-                )}
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="text-xs">
-                {done ? (
-                  <span className="text-jade" data-testid="trial-next">{trialNext(worldState, q.id)}</span>
-                ) : active ? (
-                  <span className="text-vermilion">📜 กำลังทำอยู่</span>
-                ) : status.offerable ? (
-                  <span className="text-jade">พร้อมรับ</span>
-                ) : (
-                  <span className="text-muted-foreground">{status.reason ?? "—"}</span>
-                )}
-              </div>
-              <WuxiaButton
-                variant={status.offerable ? "primary" : "default"}
-                size="sm"
-                disabled={!status.offerable}
-                onClick={() => onAccept(q.id)}
-              >
-                รับภารกิจ
-              </WuxiaButton>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}

@@ -8,7 +8,7 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ### A passed sect trial opens its lesson
 
-- **บททดสอบก่อนสืบทอด gives its move's quest at once**: the eight T3 art trials paid their gold and sect points, but the lineage quest they open waited for one rank more, and the window said "✓ เรียนแล้ว". The lesson now opens at the trial's own rank (`trialOpens`, test in `test:story`), and the ลมปราณ tab says "✓ ผ่านแล้ว" and names the next quest, its teacher and anything still missing.
+- **บททดสอบก่อนสืบทอด gives its move's quest at once**: the eight T3 art trials paid their gold and sect points, but the lineage quest they open waited for one rank more, and the window said "✓ เรียนแล้ว". The lesson now opens at the trial's own rank (`trialOpens`, test in `test:story`), and the trials are taken from their giver in person like the T4 saga trials: the sect window drops its ลมปราณ tab (`isSecretSectQuest` covers `LINEAGE_PROLOGUES`), and its badge no longer counts them.
 
 ### The สำนัก badge matches the window
 

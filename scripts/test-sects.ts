@@ -308,14 +308,14 @@ check("sect quests: each one again two real hours after it was taken, the others
   } finally { setTestClock(null); }
 });
 
-check("the สำนัก badge is the sum of the window's tab counts (rank-up, quests, art trials)", () => {
+check("the สำนัก badge is the sum of the window's tab counts (rank-up, quests); sect trials are not in it", () => {
   newGame();
   const def = SECT_MEMBERSHIPS.wudang;
   useWorldStore.setState({ sectMembership: { wudang: member("wudang", { rank: def.startRank, points: def.rankUpCost(def.startRank - 1) }) } as never });
   const a = sectActionsFor(store(), "wudang");
   assert.equal(a.rankUp, 1, "an affordable rank-up counts on its own tab");
   assert.ok(a.quests > 0, "repeatable quests counted");
-  assert.equal(sectActionCount(store()), a.rankUp + a.quests + a.art);
+  assert.equal(sectActionCount(store()), a.rankUp + a.quests);
   // What the ภารกิจประจำ tab lists as ready is its count.
   const ready = getQuestsForSect("wudang").filter((q) => !q.isArtQuest && q.id !== redemptionQuestId("wudang") && isSectQuestOfferable(store(), q).offerable);
   assert.equal(a.quests, ready.length);

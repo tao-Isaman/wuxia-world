@@ -13,7 +13,7 @@ import { TRAIT_LABEL } from "./types";
 import { getItem, getNpc, getOpponent, scrollItemId } from "./data";
 import { getQuest, getQuestsForSect } from "./data/quests";
 import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
-import { SAGA_PROLOGUES } from "./data/story";
+import { LINEAGE_PROLOGUES, SAGA_PROLOGUES } from "./data/story";
 import { evaluateCondition, gearlessStat } from "./conditions";
 import { HOURS_PER_DAY } from "./clock";
 import { absoluteHours, arrestPenalty, bribeCost, describeSentence, jailCityFor, sentenceLeft } from "./law";
@@ -867,9 +867,9 @@ export function isQuestOfferable(state: WorldStateData, def: QuestDef): boolean 
   return true;
 }
 
-// The T4 saga trials (SAGA_PROLOGUES): hidden from the sect window, offered by
-// their giver in person.
-const SECRET_SECT_QUESTS: ReadonlySet<string> = new Set(Object.values(SAGA_PROLOGUES));
+// The sect trials — the T4 saga trials (SAGA_PROLOGUES) and the T3 lineage
+// trials (LINEAGE_PROLOGUES): off the sect window, offered by their giver in person.
+const SECRET_SECT_QUESTS: ReadonlySet<string> = new Set([...Object.values(SAGA_PROLOGUES), ...Object.values(LINEAGE_PROLOGUES)]);
 export function isSecretSectQuest(questId: string): boolean {
   return SECRET_SECT_QUESTS.has(questId);
 }
@@ -936,22 +936,20 @@ export function isSectQuestOfferable(
 
 /**
  * Things to do in one sect's สำนัก window, by its tab: an affordable rank-up
- * (ขั้นและวิชา), the repeatable quests it offers now (ภารกิจประจำ) and the art
- * trials (ลมปราณ). An inactive membership has none. Secret T4 saga trials and
- * the redemption quest are left out — the window never lists them.
+ * (ขั้นและวิชา) and the repeatable quests it offers now (ภารกิจประจำ). An
+ * inactive membership has none. The sect trials and the redemption quest are
+ * left out — their giver offers them in person, the window never lists them.
  */
-export function sectActionsFor(state: WorldStateData, sectId: string): { rankUp: number; quests: number; art: number } {
-  const none = { rankUp: 0, quests: 0, art: 0 };
+export function sectActionsFor(state: WorldStateData, sectId: string): { rankUp: number; quests: number } {
+  const none = { rankUp: 0, quests: 0 };
   const m = state.sectMembership[sectId as keyof typeof state.sectMembership];
   if (!m || (m.status ?? "active") !== "active") return none;
   const def = SECT_MEMBERSHIPS[sectId as keyof typeof SECT_MEMBERSHIPS];
   if (!def) return none;
   const out = { ...none, rankUp: m.rank > def.topRank && m.points >= def.rankUpCost(m.rank - 1) ? 1 : 0 };
   for (const quest of getQuestsForSect(sectId)) {
-    if (isSecretSectQuest(quest.id) || isRedemptionQuest(quest)) continue;
-    if (!isSectQuestOfferable(state, quest).offerable) continue;
-    if (quest.isArtQuest) out.art++;
-    else out.quests++;
+    if (quest.isArtQuest || isSecretSectQuest(quest.id) || isRedemptionQuest(quest)) continue;
+    if (isSectQuestOfferable(state, quest).offerable) out.quests++;
   }
   return out;
 }
@@ -961,7 +959,7 @@ export function sectActionCount(state: WorldStateData): number {
   let count = 0;
   for (const sectId of Object.keys(state.sectMembership)) {
     const a = sectActionsFor(state, sectId);
-    count += a.rankUp + a.quests + a.art;
+    count += a.rankUp + a.quests;
   }
   return count;
 }
