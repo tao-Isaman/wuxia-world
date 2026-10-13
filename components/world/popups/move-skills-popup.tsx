@@ -39,6 +39,7 @@ import { UpgradePayoff, type UpgradeReceipt } from "./upgrade-payoff";
 import { ArtIcon, SkillIcon } from "@/components/game/skill-icon";
 import { rarityColor } from "@/lib/ui/rarity";
 import { PagedGrid } from "@/components/ui/paged-grid";
+import { SkillGuide } from "./skill-guide";
 import { useShortScreen } from "@/components/ui/use-short-screen";
 
 interface Props {
@@ -71,6 +72,7 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
   const [selectedSlot, setSelectedSlot] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [filter, setFilter] = useState<LibraryFilter>("all");
+  const [guide, setGuide] = useState(false);
   const short = useShortScreen();
 
   useEffect(() => {
@@ -221,8 +223,11 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
               </span>
             ))}
           </div>
+          <button type="button" className="skills-guide-button" onClick={() => setGuide(true)} data-testid="skill-guide-open">
+            📖 คู่มือวิชา <small>ขัดแย้ง · อาวุธ · ความชำนาญ</small>
+          </button>
           {conflictedTypes.length > 0 && (
-            <div className="skills-conflict" title="วิชาที่ติดตั้งเอียงไปทางหนึ่งมากเกินไป วิชาฝั่งตรงข้ามจึงอ่อนกำลังลง">
+            <div className="skills-conflict" title="วิชาที่เรียนไว้เอียงไปทางหนึ่งมากเกินไป วิชาฝั่งตรงข้ามจึงอ่อนกำลังลง — ดูคู่มือวิชา">
               วิชาขัดกัน: {conflictedTypes.map((t) => `สาย${SKILL_TYPE_LABEL[t]}${conflictText(conflict[t] ?? 1)}`).join(" · ")}
             </div>
           )}
@@ -305,6 +310,7 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
           )}
         </section>
       </div>
+      <SkillGuide open={guide} onClose={() => setGuide(false)} build={player} />
     </Modal>
   );
 }

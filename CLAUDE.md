@@ -200,7 +200,7 @@ Two deliberate exceptions reach into stores:
 - **Levels 1–10** (`leveling.ts`).
   - `effectiveBp` goes from 50 % at lv 1 to 100 % at lv 10; a skill's `st` bonus scales the same way. Art stats scale by `level/10`.
   - Xp to the next level: skill `50 × lv × (tier+1)`; art `100 × lv × (tier+1)`.
-- **Type conflict** (`skill-conflict.ts`). With more than 4 typed entries and one side above 60 % of an axis, the opposing type is halved (internal ↔ external: zeroed).
+- **Type conflict** (`skill-conflict.ts`). With more than 4 learned entries (every learned skill and art, slotted or not; `conflictTally`) and one side above 60 % of an axis, the opposing type is halved (internal ↔ external: zeroed). The skills window's 📖 คู่มือวิชา (`components/world/popups/skill-guide.tsx`) draws these rules, the weapon match and mastery with the hero's own tallies.
 - **Slots** (`slots.ts`). A slot holds a bare skill id or `"art:<id>"` (`parseSlotId`). The first art slot is the primary art.
 - **Turn gauge.** It fills at `(Spd + 60) / 2600` per ms and acts at 100, keeping the overflow. **Don't replace the `+60` baseline with a straight Spd comparison** — it keeps slow characters in the fight (Spd 100 vs 20 is 2:1, not 5:1).
 - **The grid** (`lib/game/grid/`) is the live battle system (board 10 × 7 up to 15 × 10 by unit count, `boardSizeFor`; packs up to 6, `MAX_PACK_SIZE`):

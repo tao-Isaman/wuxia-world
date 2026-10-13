@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-13
 
+### คู่มือวิชา in the skills window
+
+- **A guide button**: the skills window's 📖 คู่มือวิชา opens an infographic in two tabs — วิชาขัดแย้ง (the three opposing pairs with the hero's own tallies against the 60 % line, whether the rule is on, what shrinks and what does not) and อาวุธ · ความชำนาญ · ความเสียหาย (the weapon in hand ±10 %, mastery per family, how a hit multiplies). `conflictTally` (`lib/game/skill-conflict.ts`) is the tally `computeConflictFactors` now reads. The conflict note's tooltip no longer says only slotted moves count.
+
 ### The weapon in hand matters
 
 - **Weapon match**: a move hits 10 % harder with a weapon of its family in hand and 10 % softer with another (bare hands are fist for the hero; foes without a weapon, arts and beast moves are neutral). Every weapon now carries its family (`Equipment.fam`; หมัดเหล็ก is fist, it read as a hidden weapon from its icon), and the skills window says how a move stands with the weapon held (`lib/game/weapon-match.ts`).

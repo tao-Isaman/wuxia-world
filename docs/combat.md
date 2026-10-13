@@ -235,7 +235,7 @@ Arts scale their `stats` by `level/10` and add `hL` / `mL` HP / MP per level. Wh
 
 ### Type conflict
 
-`computeConflictFactors(build)` in `lib/game/skill-conflict.ts`:
+`computeConflictFactors(build)` in `lib/game/skill-conflict.ts` (the tally itself is `conflictTally(build)`, which the skills window's 📖 คู่มือวิชา also draws):
 
 - Counted entries: every distinct slotted or learned skill and every learned art (not `none`). **Untyped entries count toward the trigger too.**
 - The penalty needs at least 5 entries (`> CONFLICT_MIN_LEARNED = 4`).

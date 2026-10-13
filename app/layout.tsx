@@ -9,6 +9,7 @@ import "./pwa.css";
 import "./mobile-hud.css";
 import "./profile.css";
 import "./menu-layout.css";
+import "./skill-guide.css";
 import "./meridian.css";
 import "./world-map.css";
 import { PwaRegister } from "@/components/pwa";

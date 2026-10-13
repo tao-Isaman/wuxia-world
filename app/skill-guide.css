@@ -1,0 +1,74 @@
+/* คู่มือวิชา — the skills window's infographic (components/world/popups/skill-guide.tsx). */
+.skills-guide-button {
+  display: flex; align-items: baseline; gap: 6px; width: 100%; padding: 5px 10px; text-align: left;
+  font-size: 13px; font-weight: 700; color: var(--scroll-ink); background: #fff4d6;
+  border: 1px solid var(--scroll-gold); border-radius: 6px; box-shadow: 0 1px 0 var(--scroll-edge);
+}
+.skills-guide-button:hover { background: #ffe9b0; }
+.skills-guide-button small { font-weight: 400; font-size: 11px; color: var(--scroll-ink-soft); }
+
+.sg-tabs { display: flex; gap: 4px; margin-bottom: 8px; border-bottom: 1px solid var(--scroll-line); }
+.sg-tabs button { padding: 5px 12px; font-size: 13px; color: var(--scroll-ink-soft); border-bottom: 3px solid transparent; }
+.sg-tabs button[aria-selected=true] { color: var(--ribbon-deep); font-weight: 700; border-bottom-color: var(--ribbon); }
+.skill-guide { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; color: var(--scroll-ink); }
+.sg-card {
+  display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; min-width: 0;
+  background: linear-gradient(180deg, #fbf1d8, #f0e2bf); border: 1px solid var(--scroll-line); border-radius: 8px;
+  box-shadow: inset 0 0 0 2px #fff8e6aa;
+}
+.sg-card--wide { grid-column: 1 / -1; }
+.sg-card small { font-size: 11.5px; color: var(--scroll-ink-soft); }
+.sg-title { display: flex; align-items: center; gap: 6px; margin: 0; font: 700 18px var(--font-display, serif); color: var(--ribbon-deep); }
+.sg-lead { margin: 0; font-size: 13px; line-height: 1.5; }
+
+.sg-gate { display: flex; align-items: center; gap: 10px; padding: 6px 10px; font-size: 13px; border-radius: 6px; background: #e8f1dc; border: 1px solid #8fae6b; }
+.sg-gate--on { background: #fbe3d9; border-color: #c4705c; }
+.sg-gate-count { display: grid; place-items: center; min-width: 34px; height: 34px; font: 700 18px ui-monospace, monospace; color: #fff; background: #5d7a3c; border-radius: 50%; }
+.sg-gate--on .sg-gate-count { background: var(--ribbon); }
+
+.sg-axes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.sg-axis { display: flex; flex-direction: column; gap: 4px; padding: 6px 8px; background: #fffaf0; border: 1px solid var(--scroll-line); border-radius: 6px; }
+.sg-axis[data-loser]:not([data-loser=""]) { border-color: var(--ribbon); box-shadow: inset 0 0 0 1px #a8392a55; }
+.sg-axis-head { display: flex; justify-content: space-between; align-items: baseline; gap: 4px; font-size: 12.5px; white-space: nowrap; }
+.sg-axis-rule { font-size: 10.5px; color: var(--scroll-ink-soft); }
+.sg-lose { color: var(--ribbon); text-decoration: line-through; text-decoration-thickness: 1px; }
+.sg-bar { position: relative; height: 12px; border-radius: 6px; background: #5b7da8; overflow: hidden; }
+.sg-bar-left { position: absolute; inset: 0 auto 0 0; background: #d18b3a; }
+.sg-bar-mark { position: absolute; top: -2px; bottom: -2px; width: 2px; margin-left: -1px; background: #2b1a0e; opacity: .7; }
+.sg-axis-state { font-size: 11.5px; line-height: 1.35; }
+
+.sg-split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.sg-list { padding: 6px 10px; border-radius: 6px; }
+.sg-list h5 { margin: 0 0 4px; font-size: 13px; font-weight: 700; }
+.sg-list ul { margin: 0 0 4px; padding: 0; list-style: none; display: grid; gap: 2px; font-size: 12.5px; }
+.sg-list--down { background: #fbe3d9; border: 1px solid #d79a86; }
+.sg-list--down li::before { content: "▼ "; color: var(--ribbon); }
+.sg-list--keep { background: #e8f1dc; border: 1px solid #a9c48a; }
+.sg-list--keep li::before { content: "✔ "; color: #4d7a2a; }
+
+.sg-held { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 13px; }
+.sg-match { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.sg-match > div { display: grid; justify-items: center; padding: 6px; border-radius: 6px; text-align: center; font-size: 12px; }
+.sg-match b { font: 700 22px ui-monospace, monospace; }
+.sg-match-up { background: #e8f1dc; border: 1px solid #a9c48a; color: #355b1c; }
+.sg-match-down { background: #fbe3d9; border: 1px solid #d79a86; color: #8a2a1e; }
+
+.sg-mastery { display: grid; gap: 3px; }
+.sg-mastery-row { display: grid; grid-template-columns: 88px 1fr 46px; align-items: center; gap: 6px; font-size: 12px; }
+.sg-mastery-row b { text-align: right; font-variant-numeric: tabular-nums; }
+.sg-mastery-bar { height: 8px; border-radius: 4px; background: #e3cd9c; overflow: hidden; }
+.sg-mastery-bar > span { display: block; height: 100%; background: linear-gradient(90deg, #c99a45, #a8392a); }
+
+.sg-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.sg-flow > span { display: grid; padding: 6px 10px; font-size: 12.5px; font-weight: 700; text-align: center; background: #fffaf0; border: 1px solid var(--scroll-line); border-radius: 6px; }
+.sg-flow > span small { font-weight: 400; }
+.sg-flow > i { font: 700 18px ui-monospace, monospace; font-style: normal; color: var(--ribbon-deep); }
+
+@media (orientation: landscape) and (max-height: 500px), (orientation: portrait) and (max-width: 500px) {
+  .skill-guide { gap: 6px; }
+  .sg-card { padding: 6px 8px; gap: 5px; }
+  .sg-title { font-size: 16px; }
+  .sg-lead, .sg-list ul, .sg-axis-head { font-size: 11.5px; }
+  .sg-axes { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+  .sg-match b { font-size: 17px; }
+}

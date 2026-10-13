@@ -49,19 +49,32 @@ export function effectiveTypes(item: { types?: readonly SkillType[]; at?: unknow
   return [];
 }
 
-// Compute the conflict-factor map from a build's learned skills+arts.
-// Slotted skills + the active art are also "learned" implicitly so the
-// caller doesn't have to maintain perfect parallel arrays.
-export function computeConflictFactors(
+/** The three opposing pairs, in the order the guide shows them. */
+export const CONFLICT_AXES: readonly (readonly [SkillType, SkillType])[] = [["yang", "yin"], ["hard", "soft"], ["external", "internal"]];
+
+/** The loser's factor on an axis: ×0.5, or ×0 for internal ⇄ external. */
+export function conflictSeverity(type: SkillType): number {
+  return PAIR[type]?.severity ?? 1;
+}
+
+export interface ConflictTally {
+  /** Every learned skill and art (slotted or not, `balance` too). */
+  entries: number;
+  /** Typed tags per type (balance not counted). */
+  counts: Partial<Record<SkillType, number>>;
+}
+
+// Tally a build's learned skills + arts. Slotted skills and the active art
+// are also "learned" implicitly so the caller doesn't have to maintain
+// perfect parallel arrays.
+export function conflictTally(
   build: CharacterBuild | null | undefined,
   lookups: {
     getSkill: (id: string | null | undefined) => Skill | null;
     getArt: (id: string | null | undefined) => Art;
   },
-): ConflictFactors {
-  if (!build) return {};
-
-  // Gather every skill / art id the player counts toward conflict.
+): ConflictTally {
+  if (!build) return { entries: 0, counts: {} };
   const skillIds = new Set<string>();
   for (const s of build.skillIds) if (s) skillIds.add(s);
   for (const s of build.learnedSkillIds ?? []) skillIds.add(s);
@@ -75,27 +88,35 @@ export function computeConflictFactors(
   // but the entry still counts toward the > 4 trigger threshold so a
   // balanced player can still cross into "your loadout matters" territory.
   const counts: Partial<Record<SkillType, number>> = {};
-  let totalLearnedEntries = 0;
+  let entries = 0;
   const bump = (types: readonly SkillType[]) => {
     for (const t of types) {
       if (t === "balance") continue;
       counts[t] = (counts[t] ?? 0) + 1;
     }
-    totalLearnedEntries++;
+    entries++;
   };
-
   for (const id of skillIds) {
     const sk = lookups.getSkill(id);
-    if (!sk) continue;
-    bump(effectiveTypes(sk));
+    if (sk) bump(effectiveTypes(sk));
   }
   for (const id of artIds) {
     const art = lookups.getArt(id);
-    if (!art || art.id === "none") continue;
-    bump(effectiveTypes(art));
+    if (art && art.id !== "none") bump(effectiveTypes(art));
   }
+  return { entries, counts };
+}
 
-  if (totalLearnedEntries <= CONFLICT_MIN_LEARNED) return {};
+// Compute the conflict-factor map from a build's learned skills+arts.
+export function computeConflictFactors(
+  build: CharacterBuild | null | undefined,
+  lookups: {
+    getSkill: (id: string | null | undefined) => Skill | null;
+    getArt: (id: string | null | undefined) => Art;
+  },
+): ConflictFactors {
+  const { entries, counts } = conflictTally(build, lookups);
+  if (entries <= CONFLICT_MIN_LEARNED) return {};
 
   // For each axis pair, compare the two opposing tag counts directly. A
   // type "wins" the axis when it holds > 60 % of that axis's pair sum —
