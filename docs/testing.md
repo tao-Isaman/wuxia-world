@@ -117,6 +117,7 @@ Read-only scripts, not wired into `package.json`:
 - Base URL `http://127.0.0.1:3017`, viewport 1440 × 900.
 - Traces are kept on failure.
 - **`storageState` seeds `localStorage["wuxia-random-events"] = "off"`** so walk ticks never ambush a test. Only `law-guide.spec.ts` and `roaming-foes.spec.ts` remove the key.
+- **It also seeds `localStorage["wuxia-hud-menu"] = "open"`** so the HUD's section icons stay out on phone viewports (phones fold them behind เมนู otherwise). Only `hud-menu.spec.ts` removes it.
 - `webServer` starts **`next dev`** on :3017 when nothing is listening there (`reuseExistingServer` unless `CI` is set).
 
 Many specs replace `Math.random` in the page to make rolls predictable.
@@ -136,6 +137,8 @@ Many specs replace `Math.random` in the page to make rolls predictable.
 | `online.spec.ts` | 7 | the flow account → character → play; a saved token the server no longer accepts lands on the log-in step; a returning player logs in (name filled in) straight back to their game, and signing out asks again; two browsers sign up and start heroes; each sees the other at home; one walks and the other sees it live; closing one makes them leave; two characters on one account; a fight checked by the server; between two players: map chat with a bubble over the speaker (typing does not walk), a tap on the other player opens the card, a friend request accepted in สหาย, a party (frame, colour, chat), a letter with 100 ตำลึง taken with รับของ and checked in both saves; another player's outfit and weapon seen, and a change seen at once. **Needs the game server** (`bun run server:dev`); skipped when none answers ([online.md](online.md)) |
 | `law-guide.spec.ts` | 3 | walking while wanted draws the law; jail minutes per mark, served on the world clock; retreat gives no rewards; the quest guide and the busy overlay |
 | `mobile-controls.spec.ts` | 2 | a phone on its side: the vitals card top-left with the icon bar under it, joystick, action button, rest bubble, profile; the five column menus fit without scrolling. A phone held upright: the page is turned 90° and the joystick still walks the right way |
+| `hud-menu.spec.ts` | 2 | the phone HUD (suite seed dropped): icons folded behind เมนู, its badge the icons' sum, every icon ≥ 44 px, a section folds it again, hotkeys still open sections; a desktop shows every icon |
+| `menu-close.spec.ts` | 6 | every menu section at six screen sizes: no drawn text under the panel's ✕ |
 | `hero-actions.spec.ts` | 2 | the creation screen sets the body by gender; a save with a retired body plays as m1 and the hero fights with the fist row's painted frames (`data-hero-poses`); resting plays the sleep loop in the work overlay and on the hero on the map (`data-player-action`) |
 | `guide-hud.spec.ts` | 3 | on a phone on its side, a phone held upright (the page turned) and a desktop view, walking around with a tracked quest, the guide's edge pointer is never under a HUD box (`data-guide-edge` vs `[data-hud-occluder]`) |
 | `opening.spec.ts` | 1 | the first session: clinic errand, a bought potion, the free duel on auto, rests, a w-exp upgrade |

@@ -7,7 +7,7 @@ export default defineConfig({
     // Walk ticks roll random encounters; specs opt back in by removing this key.
     // Conversations show all their lines at once (fast text); dialogue.spec turns it off to test the beats.
     storageState: { cookies: [], origins: [{ origin: "http://127.0.0.1:3017",
-      localStorage: [{ name: "wuxia-random-events", value: "off" }, { name: "wuxia-dialog-instant", value: "on" }] }] },
+      localStorage: [{ name: "wuxia-random-events", value: "off" }, { name: "wuxia-dialog-instant", value: "on" }, { name: "wuxia-hud-menu", value: "open" }] }] },
     trace: { mode: "retain-on-failure", screenshots: false, snapshots: true }, screenshot: "only-on-failure" },
   webServer: { command: "node node_modules/next/dist/bin/next dev --hostname 127.0.0.1 --port 3017",
     url: "http://127.0.0.1:3017", reuseExistingServer: !process.env.CI, timeout: 120_000 },

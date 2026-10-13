@@ -6,6 +6,15 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-13
 
+### A cleaner phone HUD ([design/mobile-hud.md](design/mobile-hud.md))
+
+- **เมนู folds the icons**: on a phone the eleven section icons sit behind one เมนู button (their badges summed on it) and fold again after a section opens, so the map is the map; larger screens still show them all. Number keys and M work either way.
+- **Bigger touch targets and text**: every HUD icon is at least 44 × 44 px with 10.5–11 px labels (was 38–40 px and 9 px), the vitals' labels and numbers 11–12 px.
+- **จุดหมาย is a plain button on touch screens** (no empty half where the keyboard hint was), 44 px tall.
+- **The overheard-rumor banner** keeps to two lines and a narrower box on phones.
+- **Battle meters read ชีวิต / ปราณ** instead of HP / MP.
+- **Quests on an island name the island**: the tracker shows ⛵ ลงเรือลุงจางไป <island> when the next leg is a crossing, and the boatman's list puts that pier first, marked 📌 ตามภารกิจ. A foe that also lives a few roads away on land is hunted there instead of across a paid crossing.
+
 - **โจมตีภายนอก / โจมตีภายใน** everywhere a stat is named (profile, gear options, enhancement, meridians, buffs, the battle log): no more โจมตีกาย(ภาพ) / โจมตีใน, matching how moves already read.
 - **No more "พิมพ์เร็วเกินไป" on a scene change**: the hero set down at the arrival side was sent as a step the room refused as too fast, and every refusal showed as a chat warning. A jump on the same map now rejoins the room at the new spot, and only a refused chat line warns in the chat.
 - **Outfits are never sold**: the six cloth outfits (ชุดคราม, ชุดขาวไว้ทุกข์, ชุดหมึกดำ, ชุดผ้าไหมแดง, ชุดเขียวหยก, ชุดขุนนางทอง) left the tailors. Each now comes as an item (read it from the bag and it stays in the wardrobe) from quests, foes' drops and tailoring recipes that foes drop (สูตรตัด…); a locked one in the ชุด tab says where it comes from.

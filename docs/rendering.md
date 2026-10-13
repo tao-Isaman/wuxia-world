@@ -360,13 +360,14 @@ On a map (`MapHud` in `components/world/map-hud.tsx` + `MenuBar hud`):
 - **Top left:** `.hud-topleft` stacks the vitals card (`components/world/hud-vitals.tsx`, `[data-testid="hud-vitals"]`: HP / MP / พลัง gauges as `role="meter"`, no portrait) over the icon bar (`nav.hud-iconbar[aria-label="เมนูเกม"]`).
   - Nine section icons: 1 โปรไฟล์, 2 ย่าม, 3 วิชา, 4 อาชีพ, 5 ภารกิจ (badge = active quests), 6 สำนัก (badge = things to do), 7 บันทึก, 8 จดหมาย (badge = unread), 9 ชีพจร (badge = unspent meridian points, shown only while some point can be opened with them — `meridianActionable`).
   - Then ♪ and the install icon.
-  - Layout: two rows on desktop and landscape; on phones, rows of four.
+  - **เมนู** (`[data-testid="hud-menu-toggle"]`) heads the bar and folds every icon behind it. Phones (`(orientation: landscape) and (max-height: 500px)`, either way up) start folded and fold again after a section opens; the folded button shows the icons' badges summed. Larger screens start unfolded. `localStorage["wuxia-hud-menu"] = "open"` keeps the icons out everywhere (the e2e suite seeds it; `hud-menu.spec.ts` drops it). Number keys and M open sections either way.
+  - Layout: two rows on desktop and landscape; on phones, rows of four. Every icon is at least 44 × 44 px with an 11 px label (10.5 on phones); [design/mobile-hud.md](design/mobile-hud.md) has the reasons.
 - **Top right:** the purse and the day.
   - Gold "ตำลึง" and w-exp "ยุทธ", each with a floating +N / −N for 1.6 s.
   - The sundial: 12 shichen from ยามเหม่า, Thai numerals ๑–๑๒ on the ring and the hour's name on the face; the ring turns, and ยามซวี–ยามอิ๋น are styled as night (`isNight`, `lib/world/clock.ts`).
   - The "วันที่ N" pill, and the hour line (hidden on phones).
 - **Waypoint card** (`.qt-waypoint`, `[data-waypoint]`): when a place is picked on the world map, a gold-edged card above the quest tracker — 🧭 the place and the roads left, ✕ to drop it.
-- **Quest tracker** under the purse (`quest-tracker.tsx`): 📌 stage n/N, the quest name, 🎯 action and counter, 📍 place and roads left. Tapping it opens the quest log. It heads `.hud-right-stack` (`app/mobile-hud.css`, a flex column at the top right); the map's `extras` (the drawer button) sit right-aligned below it, so a tall tracker pushes the button down instead of covering it.
+- **Quest tracker** under the purse (`quest-tracker.tsx`): 📌 stage n/N, the quest name, 🎯 action and counter, 📍 place and roads left, and when the next leg is a boat crossing ⛵ the pier to sail to (`guideFerryLeg`, shown on every screen size; the 📍 line hides on phones). Tapping it opens the quest log. It heads `.hud-right-stack` (`app/mobile-hud.css`, a flex column at the top right); the map's `extras` (the drawer button) sit right-aligned below it, so a tall tracker pushes the button down instead of covering it.
 - **Top centre:** law chips — "⛓ หมายจับ ●●○○○", "⛓ เหลือโทษ …", "🔓 พ้นโทษแล้ว · ไปที่ประตูคุก".
 - **Arrival banner.**
   - Entering a location shows "❖ name ❖" for 3.2 s.

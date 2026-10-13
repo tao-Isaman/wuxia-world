@@ -1,5 +1,6 @@
 "use client";
-import { WAYPOINT_FLAG, activeGuide, getQuest, trackedQuestId, waypointGuide } from "@/lib/world";
+import { FERRYMAN } from "@/lib/world/ferries";
+import { WAYPOINT_FLAG, activeGuide, getQuest, guideFerryLeg, trackedQuestId, waypointGuide } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
 
 /**
@@ -18,6 +19,7 @@ export function QuestTracker({ onOpen }: { onOpen: () => void }) {
           <span className="qt-kicker">🧭 จุดหมายบนแผนที่</span>
           <strong className="qt-name">{waypoint.locationName}</strong>
           <span className="qt-where">{waypoint.path.length <= 1 ? "อยู่ที่นี่" : `อีก ${waypoint.path.length - 1} ช่วงทาง · ตามลูกศรไป`}</span>
+          <FerryLeg guide={waypoint} />
           <button type="button" className="qt-cancel" aria-label="ยกเลิกการนำทาง" title="ยกเลิกการนำทาง"
             onClick={() => useWorldStore.getState()._setFlag(WAYPOINT_FLAG, "")}>✕</button>
         </div>
@@ -48,7 +50,16 @@ function TrackedQuest({ onOpen }: { onOpen: () => void }) {
           {guide?.progress && <b> {guide.progress.current}/{guide.progress.required}</b>}
         </span>
         {where && <span className="qt-where">📍 {where}</span>}
+        <FerryLeg guide={guide} />
       </button>
     </aside>
   );
+}
+
+/** A boat leg next: which pier to ask the boatman for (shown on every screen size). */
+function FerryLeg({ guide }: { guide: Parameters<typeof guideFerryLeg>[1] }) {
+  const sceneId = useWorldStore((s) => s.currentSceneId);
+  const leg = guideFerryLeg({ currentSceneId: sceneId }, guide);
+  if (!leg) return null;
+  return <span className="qt-ferry" data-ferry-to={leg.to}>⛵ ลงเรือ{FERRYMAN.name.split(" ")[0]}ไป <b>{leg.name}</b></span>;
 }

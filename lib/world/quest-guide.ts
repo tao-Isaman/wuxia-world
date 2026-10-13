@@ -279,11 +279,17 @@ function unmetLeaf(state: WorldStateData, c: Condition, quest: QuestDef): Condit
 
 type Target = Omit<QuestGuide, "questId" | "questName" | "stageIndex" | "stageCount" | "stageText" | "path" | "locationName"> & { path?: string[] };
 
+/** A boat crossing weighs as much as this many road legs (it costs gold; land comes first when it is close). */
+const FERRY_HOP_WEIGHT = 4;
+const isBoatLeg = (from: string, to: string) =>
+  isFerryHop(from, to) && !(getScene(from) as { routes?: { routeSceneId: string }[] } | null)?.routes?.some((r) => r.routeSceneId === "route_" + from + "__to__" + to);
+
 function nearest(sources: Source[], here: string | null, previous: ReadonlyMap<string, string> | null): { source: Source; path: string[] } | null {
   let best: { source: Source; path: string[]; score: number } | null = null;
   for (const source of sources) {
     const path = here && previous ? (source.locationId === here ? [here] : pathIn(previous, here, source.locationId)) : null;
-    const score = (path ? path.length : 99) + source.cost;
+    const boatLegs = path ? path.slice(1).filter((stop, i) => isBoatLeg(path[i]!, stop)).length : 0;
+    const score = (path ? path.length + boatLegs * (FERRY_HOP_WEIGHT - 1) : 99) + source.cost;
     if (!best || score < best.score) best = { source, path: path ?? [], score };
   }
   return best;
@@ -413,6 +419,18 @@ export function waypointGuide(state: WorldStateData): QuestGuide | null {
     questId: "", questName: "จุดหมายบนแผนที่", stageIndex: 0, stageCount: 1, stageText: "",
     kind: "place", action: `เดินทางไป${scene.name}`, locationId: id, locationName: scene.name, path,
   };
+}
+
+/**
+ * When the guide's next leg from here is a boat crossing: the pier it sails
+ * to (the boatman, lib/world/ferries.ts, asks which). Null on land legs.
+ */
+export function guideFerryLeg(state: Pick<WorldStateData, "currentSceneId">, guide: Pick<QuestGuide, "path"> | null): { to: string; name: string } | null {
+  const from = guide?.path[0];
+  const to = guide?.path[1];
+  if (!from || !to || from !== state.currentSceneId || !isBoatLeg(from, to)) return null;
+  const scene = getScene(to);
+  return { to, name: scene?.kind === "location" ? scene.name : to };
 }
 
 /** What the guide arrow follows: a waypoint set on the world map, else the tracked quest. */

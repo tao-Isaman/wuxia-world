@@ -30,6 +30,12 @@ import { ChatBox } from "./social/chat-box";
 import { PlayerCard } from "./social/player-card";
 import { PartyFrame } from "./social/party-frame";
 
+/** "open": the HUD menu stays unfolded on every screen (tests; phones fold it otherwise). */
+const HUD_MENU_KEY = "wuxia-hud-menu";
+/** A phone held either way (the page turns portrait into landscape). */
+const SHORT_SCREEN = "(orientation: landscape) and (max-height: 500px), (orientation: portrait) and (max-width: 500px)";
+const shortScreen = () => typeof window !== "undefined" && window.matchMedia(SHORT_SCREEN).matches;
+
 type PopupId =
   | "profile"
   | "inventory"
@@ -58,6 +64,12 @@ type PopupId =
 // duplicate state.
 export function MenuBar({ hud, extras }: { hud?: boolean; extras?: ReactNode } = {}) {
   const [open, setOpen] = useState<PopupId>(null);
+  const [menuOpen, setMenuOpen] = useState(true);
+  // Phones start with the icons folded (larger screens open); "open" in
+  // HUD_MENU_KEY keeps them out on every screen (the e2e suite seeds it).
+  const pinnedOpen = () => { try { return localStorage.getItem(HUD_MENU_KEY) === "open"; } catch { return false; } };
+  useEffect(() => { setMenuOpen(pinnedOpen() || !shortScreen()); }, []);
+  const setMenu = (next: boolean) => setMenuOpen(next);
   const close = () => setOpen(null);
   // Active-quest counter for the seal badge on the ภารกิจ tab.
   const activeQuestCount = useWorldStore(
@@ -164,27 +176,43 @@ export function MenuBar({ hud, extras }: { hud?: boolean; extras?: ReactNode } =
     return () => window.removeEventListener("keydown", onKey);
   });
 
-  // Mobile-first HUD: HP / MP / stamina, then every section one tap away as
-  // an icon, stacked top-left.
+  // Mobile-first HUD: HP / MP / stamina, then the sections. On a phone the
+  // icons fold behind one เมนู button (badges summed on it) so the map stays
+  // clear, and fold back after a section opens; larger screens show them all.
+  // The player's choice is remembered (localStorage, per device).
+  const badgeTotal = tabs.reduce((sum, t) => sum + (t.badge ?? 0), 0);
+  const pick = (id: Exclude<PopupId, null>) => {
+    setOpen(id);
+    if (shortScreen() && !pinnedOpen()) setMenuOpen(false);
+  };
   if (hud) {
     return (
       <>
         <div className="hud-topleft" data-hud-occluder>
         <HudVitals />
         <PartyFrame onOpen={() => setOpen("friends")} />
-        <nav className="hud-iconbar" aria-label="เมนูเกม">
-          {tabs.map((t, i) => (
+        <nav className="hud-iconbar" aria-label="เมนูเกม" data-menu-open={menuOpen}>
+          <button type="button" className="hud-icon hud-menu-toggle" data-testid="hud-menu-toggle" aria-expanded={menuOpen}
+            aria-label={menuOpen ? "ซ่อนเมนู" : "เมนู"} title={menuOpen ? "ซ่อนเมนู" : "เมนู"}
+            onClick={() => setMenu(!menuOpen)}>
+            <span className="hud-icon-glyph" aria-hidden="true">{menuOpen ? "✕" : "☰"}</span>
+            <span className="hud-icon-label" aria-hidden="true">{menuOpen ? "ซ่อน" : "เมนู"}</span>
+            {!menuOpen && badgeTotal > 0 && <b className="hud-icon-badge" aria-hidden="true">{badgeTotal}</b>}
+          </button>
+          {menuOpen && tabs.map((t, i) => (
             <button key={t.id} type="button" title={`${t.label} (${hotkey(i)})`} aria-label={t.label} aria-keyshortcuts={hotkey(i)}
-              className="hud-icon" onClick={() => setOpen(t.id)}>
+              className="hud-icon" onClick={() => pick(t.id)}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={t.icon} alt="" className="pixel" draggable={false} />
               <span className="hud-icon-label" aria-hidden="true">{t.label}</span>
               {typeof t.badge === "number" && <b className="hud-icon-badge" aria-hidden="true">{t.badge}</b>}
             </button>
           ))}
-          <SoundButton />
-          <OnlineButton />
-          <InstallGameButton variant="icon" />
+          {menuOpen && <>
+            <SoundButton />
+            <OnlineButton />
+            <InstallGameButton variant="icon" />
+          </>}
         </nav>
         </div>
         {/* Top right, under the purse: the tracked quest, then whatever the

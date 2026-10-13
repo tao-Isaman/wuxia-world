@@ -68,6 +68,8 @@ test("world map: where the hero is, the regions, a planned way to an island, and
   expect(cancel!.width).toBeLessThan(30);
   expect(cancel!.x).toBeGreaterThanOrEqual(kicker!.x + kicker!.width - 1);
   await expect(canvas).toHaveAttribute("data-guide-marker", "npc-ferry_boatman", { timeout: 20_000 });
+  // The card names the island to sail to (the arrow alone only shows the boatman).
+  await expect(page.locator("[data-waypoint] [data-ferry-to]")).toHaveAttribute("data-ferry-to", "isle_boni");
 
   // The boatman sails the hero over for a fare; arriving ends the waypoint.
   const gold = (await save(page)).gold;
@@ -76,6 +78,9 @@ test("world map: where the hero is, the regions, a planned way to an island, and
   await page.locator(`[data-places-tab="${await boatman.getAttribute("data-category")}"]`).click();
   await boatman.click();
   await expect(page.getByTestId("ferry-trips")).toBeVisible();
+  // The pier the guide sails to comes first, marked.
+  await expect(page.getByTestId("ferry-trips").locator("li").first()).toHaveAttribute("data-guide", "true");
+  await expect(page.getByTestId("ferry-trips").locator("li").first()).toContainText("ตามภารกิจ");
   await page.getByTestId("ferry-sail-isle_boni").click();
   await expect.poll(async () => (await save(page)).currentSceneId, { timeout: 20_000 }).toBe("isle_boni");
   const after = await save(page);

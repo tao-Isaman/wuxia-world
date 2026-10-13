@@ -25,7 +25,10 @@
 }
 .hud-icon img { width: 22px; height: 22px; }
 .hud-icon-glyph { font-size: 17px; line-height: 22px; color: var(--dq-gold); }
-.hud-icon-label { font-size: 10px; line-height: 1.2; white-space: nowrap; }
+.hud-icon-label { font-size: 11px; line-height: 1.2; white-space: nowrap; }
+/* The เมนู button that folds the icons (phones start folded; badges summed on it). */
+.hud-menu-toggle { border-color: var(--dq-gold); }
+.hud-menu-toggle .hud-icon-glyph { font-size: 18px; line-height: 20px; }
 .hud-icon:hover, .hud-icon:focus-visible { border-color: var(--dq-gold); outline: none; }
 .hud-icon:active { transform: scale(.94); }
 .hud-icon-badge {
@@ -106,6 +109,9 @@
 /* Touch screens: the keyboard hint and E badge are noise. */
 @media (pointer: coarse) {
   .world-keyboard-hint, .action-prompt kbd { display: none; }
+  /* With the hints gone, จุดหมาย is a plain button (no empty half, no divider). */
+  .world-controls { padding: 2px 4px; gap: 0; }
+  .world-controls button { border-left: 0; min-height: 44px; }
 }
 
 /* Tablets / small laptops: slimmer card, icons wrap beside it. */
@@ -127,13 +133,14 @@
   .hud-topleft { top: max(6px, var(--safe-top)); left: max(6px, var(--safe-left)); width: 206px; gap: 4px; }
   .hud-vitals-card { padding: 3px 7px 4px; }
   .hud-vitals-card .hud-gauge { grid-template-columns: 30px 1fr 32px; gap: 4px; }
-  .hud-vitals-card .hud-gauge-label { font-size: 9px; height: 12px; }
+  .hud-vitals-card .hud-gauge-label { font-size: 11px; height: 14px; }
   .hud-vitals-card .hud-gauge-track { height: 6px; }
-  .hud-vitals-card .hud-gauge small { font-size: 11px; }
+  .hud-vitals-card .hud-gauge small { font-size: 12px; }
+  /* Touch targets stay 44 px (Apple 44 pt / Android 48 dp); four to a row. */
   .hud-iconbar { max-width: 206px; gap: 4px; }
-  .hud-icon { width: 38px; height: 40px; border-radius: 8px; }
-  .hud-icon img { width: 19px; height: 19px; }
-  .hud-icon-label { font-size: 9px; }
+  .hud-icon { width: 44px; height: 44px; border-radius: 8px; }
+  .hud-icon img { width: 20px; height: 20px; }
+  .hud-icon-label { font-size: 10.5px; }
   .rest-quick { right: max(10px, var(--safe-right)); bottom: max(10px, var(--safe-bottom)); }
   .rest-quick-button { width: 54px; height: 54px; }
   .action-prompt { right: 10px; bottom: calc(max(10px, var(--safe-bottom)) + 64px); }
@@ -148,9 +155,9 @@
   .hud-vitals-card { padding: 3px 8px 4px; }
   .hud-vitals-card .hud-gauge-track { height: 6px; }
   .hud-iconbar { gap: 4px; max-width: 240px; }
-  .hud-icon { width: 40px; height: 40px; }
-  .hud-icon img { width: 19px; height: 19px; }
-  .hud-icon-label { font-size: 9px; }
+  .hud-icon { width: 44px; height: 44px; }
+  .hud-icon img { width: 20px; height: 20px; }
+  .hud-icon-label { font-size: 10.5px; }
   .rest-quick-button { width: 52px; height: 52px; }
   .action-prompt { bottom: calc(max(8px, var(--safe-bottom)) + 62px); }
   .world-controls { bottom: calc(max(8px, var(--safe-bottom)) + 112px); }
@@ -218,6 +225,11 @@
 .qt-action { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .qt-action b { color: #f6dc8a; font-variant-numeric: tabular-nums; }
 .qt-where { font-size: 11px; color: #d8c49a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* A boat leg next: the pier to ask for, on every screen size. */
+.qt-ferry { font-size: 11.5px; color: #9fe0f0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qt-ferry b { color: #f6dc8a; }
+.ferry-trip--guide { background: #e2b14f33; box-shadow: inset 0 0 0 1px #c9942e; }
+.ferry-guide-tag { margin-right: 6px; padding: 0 6px; font-size: 11px; color: #fff4dc; background: #a8392a; border-radius: 8px; }
 /* 🧭 the world map's waypoint, above the quest: the same card, a gold edge and a ✕ to drop it. */
 .qt-waypoint { position: relative; display: flex; flex-direction: column; gap: 2px; width: 100%; padding: 6px 30px 7px 11px; color: #f3e6c8;
   border: 1px solid #9a7442; border-left: 3px solid #e2b14f; border-radius: 6px; background: #2a1611e0; box-shadow: 2px 3px 0 #0a0503aa;
@@ -243,6 +255,11 @@
   font-size: 14px; line-height: 1.5; font-style: italic; color: var(--dq-text); text-shadow: 1px 1px 0 #140a07;
   background: var(--dq-box); border: 2px solid var(--dq-edge); border-radius: 8px; box-shadow: 0 0 0 1px #140a07, 0 4px 10px #0a05038c;
   animation: rumor-fade linear forwards;
+  /* Two lines at most: the centre of the map stays the player's. */
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+@media (orientation: landscape) and (max-height: 500px), (orientation: portrait) and (max-width: 500px) {
+  .rumor-banner--floating { max-width: min(440px, calc(100% - 360px)); padding: 6px 12px; font-size: 13px; line-height: 1.45; }
 }
 .rumor-banner--floating .text-vermilion { color: var(--dq-gold); }
 @keyframes rumor-fade { 0% { opacity: 0; } 5% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; } }

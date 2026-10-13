@@ -15,7 +15,7 @@ import { FERRY_LANDINGS } from "../lib/world/data/auto-map-exits";
 import { WORLD_COORDS } from "../lib/world/data/world-coords";
 import { getScene } from "../lib/world/data/scenes";
 import { getLocationMap } from "../lib/world/data/location-maps";
-import { WAYPOINT_FLAG, guideMarkerId, navigationGuide } from "../lib/world";
+import { WAYPOINT_FLAG, guideFerryLeg, guideForQuest, guideMarkerId, navigationGuide } from "../lib/world";
 import {
   BOUT_GOLD, PLACE_BY_ROUND, PLAYER, TOURNAMENT, TOURNAMENT_NAME, boutOdds, sendTournamentInvitation, tournamentHost, currentTournament, dayOfYear, drawEntrants, playerOpponent,
   prizeOptions, registerBlock, resolveRound, roundPairs, settleTournaments, startBlock, tournamentDay, tournamentPhase, yearOf,
@@ -256,14 +256,33 @@ check("ferries: the guide walks to a port and points at the boatman for the cros
   assert.equal(guide.locationId, "isle_boni");
   assert.deepEqual(guide.path, ["city_suzhou", "isle_boni"]);
   assert.equal(guideMarkerId(store(), guide), FERRYMAN.markerId);
+  // …and says which pier to ask for (the tracker and the boatman's list show it).
+  assert.deepEqual(guideFerryLeg(store(), guide), { to: "isle_boni", name: getScene("isle_boni")!.kind === "location" ? (getScene("isle_boni") as { name: string }).name : "" });
   // From inland the walk heads for a port first.
   useWorldStore.setState({ currentSceneId: "city_capital", lastLocationId: "city_capital" });
   const inland = navigationGuide(store())!;
   assert.ok(FERRY_PORTS.includes(inland.path[inland.path.length - 2] as never), inland.path.join(" → "));
+  assert.equal(guideFerryLeg(store(), inland), null, "no boat leg from inland yet");
   // Reaching the waypoint ends it.
   useWorldStore.setState({ currentSceneId: "city_suzhou", gold: 1000 });
   store().ferryTravel("isle_boni");
   assert.equal(store().flags[WAYPOINT_FLAG], undefined);
+});
+
+check("ferries: a quarry that also lives on land a few roads away is hunted there, not across a paid crossing", () => {
+  newGame();
+  useWorldStore.setState({ currentSceneId: "city_suzhou", lastLocationId: "city_suzhou",
+    quests: { qc_dali_herb_collection: { status: "active", stage: 0, acceptedDefeatedAt: {} } as never } });
+  const progress = store().quests.qc_dali_herb_collection!;
+  for (let stage = 0; stage < 6; stage++) {
+    useWorldStore.setState({ quests: { qc_dali_herb_collection: { ...progress, stage } } });
+    const guide = guideForQuest(store(), "qc_dali_herb_collection");
+    if (guide?.kind !== "wander") continue;
+    assert.ok(!guide.locationId?.startsWith("isle_"), `wolves are found on land: ${guide.path.join(" → ")}`);
+    assert.equal(guideFerryLeg(store(), guide), null);
+    return;
+  }
+  assert.fail("the quest has a hunting stage");
 });
 
 // ─── Tournament ──────────────────────────────────────────────────────

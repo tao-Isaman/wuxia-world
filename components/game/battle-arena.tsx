@@ -68,7 +68,7 @@ function Meter({ value, max, kind, label }: { value: number; max: number; kind: 
     <span className="gb-meter-track" role="meter" aria-label={label} aria-valuemin={0} aria-valuemax={max} aria-valuenow={value}>
       <i style={{ width: `${pct}%` }} />
     </span>
-    <small>{value}/{max} {kind === "hp" ? "HP" : "MP"}</small>
+    <small>{kind === "hp" ? "ชีวิต" : "ปราณ"} {value}/{max}</small>
   </div>;
 }
 
