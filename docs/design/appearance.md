@@ -43,7 +43,7 @@ An outfit gives a target `[hue, saturation, lightness]` per class. A pixel keeps
 | six tailor's outfits (ชุดผ้าไหมแดง, ชุดหมึกดำ, ชุดคราม, ชุดเขียวหยก, ชุดขาวไว้ทุกข์, ชุดขุนนางทอง) | never sold: an item `outfit_<id>` from a quest, a foe's drop or a tailoring recipe foes drop (`lib/world/data/outfit-sources.ts`); reading it keeps the outfit for good |
 | ชุดยอดฝีมือ (champion's gold) | winning the sword tournament once |
 
-The wardrobe lists ชุดเดิม, the own sect's uniform, the found outfits (held, or locked with where they come from) and the champion's; what was found is saved (`wardrobe`), the rest follows from the save (the sect membership, the tournament history).
+The wardrobe lists only what the hero has — ชุดเดิม, the own sect's uniform, the found outfits once read and the champion's once won (an outfit not yet had is not shown); what was found is saved (`wardrobe`), the rest follows from the save (the sect membership, the tournament history).
 
 ## The weapon on the body
 

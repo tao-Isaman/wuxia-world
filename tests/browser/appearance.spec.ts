@@ -32,7 +32,7 @@ test("wardrobe: a spear on the back, a found outfit added from the bag and worn,
     state.playerBuild.equipment.W = "eq_t1_w_long"; state.inventory = { ...state.inventory, outfit_tailor_indigo: 1 };`);
   await expect(canvas).toHaveAttribute("data-player-weapon", "eq_t1_w_long", { timeout: 20_000 });
 
-  // Not yet in the wardrobe: locked, and no price — it is found, never bought.
+  // Not yet had: not in the wardrobe at all, and no price — it is found, never bought.
   const openWardrobe = async () => {
     await page.locator(".hud-iconbar").getByRole("button", { name: "โปรไฟล์", exact: true }).click();
     await page.getByRole("tab", { name: "ชุด" }).click();
@@ -42,7 +42,7 @@ test("wardrobe: a spear on the back, a found outfit added from the bag and worn,
   await expect(wardrobe).toHaveAttribute("data-worn", "default");
   await expect(wardrobe).toContainText("สะพายหลัง");
   await expect(wardrobe.locator("[data-outfit]").first()).toHaveAttribute("data-outfit", "default");
-  await expect(wardrobe.locator('[data-outfit="tailor_indigo"]')).toContainText("ยังไม่ได้มา");
+  await expect(wardrobe.locator('[data-outfit="tailor_indigo"]')).toHaveCount(0);
   await expect(wardrobe).not.toContainText("ตำลึง");
   await page.keyboard.press("Escape");
 

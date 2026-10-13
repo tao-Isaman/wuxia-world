@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-13
 
+### The wardrobe shows only outfits the hero has
+
+- **No locked outfits in the ชุด tab**: an outfit not yet had (a found one still to find, another sect's uniform) is no longer listed; the wardrobe shows only what can be worn now (`components/world/wardrobe.tsx`).
+
 ### A passed sect trial opens its lesson
 
 - **บททดสอบก่อนสืบทอด gives its move's quest at once**: the eight T3 art trials paid their gold and sect points, but the lineage quest they open waited for one rank more, and the window said "✓ เรียนแล้ว". The lesson now opens at the trial's own rank (`trialOpens`, test in `test:story`), and the trials are taken from their giver in person like the T4 saga trials: the sect window drops its ลมปราณ tab (`isSecretSectQuest` covers `LINEAGE_PROLOGUES`), and its badge no longer counts them.
