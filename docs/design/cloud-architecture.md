@@ -1,10 +1,10 @@
 # Cloud architecture: Cloudflare + Supabase — design
 
-> **Status: proposal (2026-10-14), nothing built yet.** Today the game is served by Vercel, the online server is one Cloudflare Worker whose Durable Objects keep everything ([online.md](../online.md)), and without a server the save lives in the browser. This page designs the move of **everything** onto Cloudflare and Supabase, with performance as the first concern. Decisions still open are listed at the end.
+> **Status: decided 2026-10-14; step 0–1 in progress ([§10](#10-the-migration-in-shippable-steps)).** Today the game is served by Vercel, the online server is one Cloudflare Worker whose Durable Objects keep everything ([online.md](../online.md)), and without a server the save lives in the browser. This page designs the move of **everything** onto Cloudflare and Supabase, with performance as the first concern. The owner's decisions are at the end ([Decisions](#decisions)): own username + password accounts, Rust for the realtime and event-sourced core, a server reset, budget no constraint.
 
 ## Goals
 
-1. **Everything on two platforms.** The game's pages and art on Cloudflare; the server on Cloudflare; the durable, queryable record of players and the economy in Supabase (Postgres + Auth). No Vercel, no data only in a browser for the released game (the browser-only mode stays for development and tests).
+1. **Everything on two platforms.** The game's pages and art on Cloudflare; the server on Cloudflare; the durable, queryable record of players and the economy in Supabase Postgres. No Vercel, no data only in a browser for the released game (the browser-only mode stays for development and tests).
 2. **Performance first.** Players are in Thailand and nearby. A click must never wait on a database across the sea; the game must open fast on a phone over 4G.
 3. **One owner per datum.** Every piece of state has exactly one authority. Copies are caches or read models, never a second truth.
 
@@ -43,10 +43,10 @@ What hurts most, in order:
          static files  │   API +   │ sockets          │ sign-in
                        ▼   ws      ▼                  ▼
 ┌──────────────────────────────── Cloudflare ─────────────────┐   ┌──────── Supabase (ap-southeast-1) ────────┐
-│ game.<domain>   Workers Static Assets (Next static export)  │   │ Auth  (users, sessions, JWKS)             │
+│ game.<domain>   Workers Static Assets (Next static export)  │   │ (Auth not used: own accounts, see §2)     │
 │ cdn.<domain>    R2 bucket + CDN cache (art, maps, audio,    │   │ Postgres                                   │
 │                 game tables JSON; hashed, immutable)        │   │   profiles, characters, saves_current,     │
-│ api.<domain>    Edge Worker: JWT check (JWKS in memory),    │   │   save_snapshots (meta), ledger,           │
+│ api.<domain>    Edge Worker: token check (key in memory),   │   │   save_snapshots (meta), ledger,           │
 │                 rate limits, routing, Cache API             │   │   battles, mail, friends, world_history,   │
 │                  │                                          │   │   leaderboards (materialized)              │
 │                  ▼  Durable Objects (authoritative, hot)    │   │   pg_cron · PITR backups                   │
@@ -63,8 +63,8 @@ What hurts most, in order:
 
 | Data | Owner (authority) | In Supabase | On the player's path |
 | --- | --- | --- | --- |
-| Credentials, sessions | **Supabase Auth** | `auth.users` | sign-in only (rare); every other request checks the JWT in the isolate |
-| Username, display name | Postgres `profiles` | yes (owner) | read once at sign-in, cached in the token's claims / the hub |
+| Credentials, sessions | **AccountObject** (Rust, event-sourced) | `accounts` (mirror, incl. the password hash, for recovery) | sign-in only (rare); every other request checks the signed token in the isolate |
+| Username, display name | **AccountObject** | `accounts` (mirror) | carried in the token |
 | Characters, the live save | **CharacterObject** (DO) | `characters`, `saves_current` (read model, ≤ 30 s behind) | save = one DO write (~5–20 ms) |
 | Save history | R2 snapshots + `save_snapshots` rows | metadata | never |
 | The shared world | **WorldObject** | `world_history` (deaths, successions, rumors archived) | served from the edge cache by revision |
@@ -99,20 +99,34 @@ The rule that keeps this simple: **a DO owns anything a player can change in a c
 
 Expected effect: the game interactive after **~300–400 KB** of script instead of 1.3 MB, maps from the nearest Cloudflare city (Bangkok has one), and a repeat visit almost entirely from the device.
 
-## 2. Identity: Supabase Auth, checked at the edge
+## 2. Identity: own accounts, checked at the edge
 
-- The title screen signs in with **Supabase Auth** directly (`@supabase/supabase-js`, auth only). Supabase issues an access JWT (1 h) and a refresh token; the client refreshes it.
-- Supabase signs JWTs with an **asymmetric key** (ES256). The edge Worker fetches the project's JWKS once per isolate (and keeps it in the Cache API for 10 min), then **verifies every request in memory** (~0.1 ms with WebCrypto). `KeyObject` and the `/auth/me` hop go away.
-- **Usernames.** Supabase Auth signs in by e-mail, phone or OAuth. To keep today's username + password: register `<username>@players.<domain>` as the e-mail behind the scenes (no mail is ever sent; confirmation off) and keep `profiles.username` unique. Adding real e-mail, Google or (via a custom OIDC provider) LINE later needs no schema change. *(Decision below.)*
-- **Sockets.** A WebSocket cannot send headers from the browser: the client asks `POST /ws-ticket` for a 60 s ticket (signed by the Worker, holds `sub` + room), and opens the socket with it. The long-lived JWT never sits in a URL.
-- **Claims.** A Postgres function (`custom_access_token_hook`) adds `username` to the JWT, so the Worker knows the player's name without a query.
-- **Rate limits** at the edge with the Workers Rate Limiting binding (per user and per IP), before any DO is woken.
+Decision: **username + password, as today** — no Supabase Auth for now.
+
+- **`AccountObject` stays the authority** (Rust, one per username, event-sourced: `registered`, later `password_changed`, `banned`…). One object per name makes a duplicate sign-up impossible without a database round trip. PBKDF2 stays; on the paid plan raise `PBKDF2_ITERATIONS` (the count is stored per account, so old accounts keep working and are upgraded at their next sign-in).
+- **Tokens are verified in the isolate, with no hop.** Today the TypeScript half asks the Rust half's `/auth/me` and the first request of an isolate reads the key from `KeyObject`. Instead the token becomes **self-describing** — `base64url(payload).base64url(HMAC-SHA256)`, payload `{ sub: username, iat, exp, gen }` — and both halves verify it with the key cached in memory (one `KeyObject` read per isolate, then none). A token carries the data generation, so a reset signs everyone out without a list of sessions.
+- **Mirrored to Postgres** through the outbox: `accounts (username, created_at, pbkdf2 hash + salt + rounds, status)`. The hash lives only in a table no browser role can read; it is there so a lost or reset object can be rebuilt (§3, cold start). Supabase Auth can still be added later (e-mail, Google, LINE) by linking `auth.users` to `accounts.username`.
+- **Sockets.** A WebSocket cannot send headers from the browser: the client asks `POST /ws-ticket` for a 60 s ticket (signed with the same key, holds `sub` + the room) and opens the socket with it, so the 30-day token never sits in a URL or a log.
+- **Rate limits** at the edge with the Workers Rate Limiting binding (sign-in per IP and per username; API per user), before any DO is woken.
 
 ## 3. Durable Objects: the hot, authoritative state
 
-The objects stay; their names keep the `DATA_EPOCH` prefix. Changes:
+The objects stay; their names keep the `DATA_EPOCH` prefix.
 
-- **`CharacterObject` per character** (split from `AccountObject`): a save is one character's business, so two characters of one account never queue behind each other, and the object's memory holds one save. The account's roster lives in Postgres (`characters`) and in the hub.
+**Who writes which object.** Decision: **Rust does the realtime and the event-sourced core; TypeScript does what needs the game's engines.**
+
+| Rust (`server/core` pure `decide` / `apply`, `server/worker/src` glue) | TypeScript (`server/worker/ts`, runs `lib/`) |
+| --- | --- |
+| `RoomObject`: presence, map chat, looks, the 100 ms tick, the move bucket, interest management (§7) | `WorldObject`: the simulated jianghu, echoes, killings |
+| `AccountObject`: the account's event log, sign-in, tokens | `BattleObject`, `RaidObject`: staging, seeded replay, verdicts, spoils |
+| `CharacterObject`: the character's save as an event stream — `saved { rev, patch }`, `granted { gold }`, `debited { parcel }` — with the save checks (`save.rs`) | `PlayerHub`, `PartyObject`: friends, mail, whispers, parties |
+| the **outbox** and its flush (one crate, `wuxia-outbox`, used by every Rust object; a TS twin with the same row shape) | the **Sync Worker** (Queue consumer → Hyperdrive → Postgres) and the edge entry |
+
+Everything a Rust object does is a command → `decide` → events → `apply`, and **the events are what goes to the outbox**: Postgres receives the same facts the object folded, so the read model is a projection of the event stream, not a second copy written by hand.
+
+Changes:
+
+- **`CharacterObject` per character** (split from `AccountObject`, Rust): a save is one character's business, so two characters of one account never queue behind each other, and the object's memory holds one save. The account keeps its roster (ids, names) as events.
 - **Location hints.** Objects are created with `locationHint: "apac"` so they live near the players (and near Singapore, where Supabase is). `WorldObject` too.
 - **Storage stays SQLite inside the DO** (strongly consistent, on the same machine). Each object that feeds Supabase keeps an **outbox table**: `(seq INTEGER PRIMARY KEY, kind, key, rev, body)`, written **in the same transaction** as the change it describes (`ctx.storage.transactionSync`).
 - **Flushing.** An alarm (set when the outbox goes from empty to non-empty) sends the outbox to the **`sync` Queue** in one `sendBatch` and deletes what was sent. For saves the outbox is **coalesced**: one row per character, replaced on each save, so a player saving every 1.5 s produces one Supabase write per flush window (30 s, and at once when they leave).
@@ -122,26 +136,27 @@ The objects stay; their names keep the `DATA_EPOCH` prefix. Changes:
 
 **Region:** `ap-southeast-1` (Singapore), the closest to Thai players and to Cloudflare's SEA objects. **Plan:** Pro for the released game (the free plan pauses an idle project and has no PITR).
 
-**Access from Workers: Hyperdrive** (pooled connections kept warm near the database, no TLS handshake per request) with `postgres.js`. Only the Sync Worker and a few admin / leaderboard routes talk to Postgres; the browser talks to Supabase **only for Auth**. All tables have RLS on with **no policies for `anon` / `authenticated`**: nothing is readable from the browser; the Worker connects as a dedicated role with exactly the grants it needs.
+**Access from Workers: Hyperdrive** (pooled connections kept warm near the database, no TLS handshake per request) with `postgres.js`. Only the Sync Worker and a few admin / leaderboard routes talk to Postgres; **the browser never talks to Supabase**. All tables have RLS on with **no policies for `anon` / `authenticated`**: nothing is readable from the browser; the Worker connects as a dedicated role with exactly the grants it needs.
 
 **Schema (sketch):**
 
 ```sql
-create table profiles (
-  user_id uuid primary key references auth.users on delete cascade,
-  username citext unique not null check (username ~ '^[a-z0-9_]{3,20}$'),
-  created_at timestamptz not null default now()
+create table accounts (                         -- mirror of AccountObject (the authority)
+  username citext primary key check (username ~ '^[a-z0-9_]{3,20}$'),
+  created_at timestamptz not null,
+  status text not null default 'active',        -- active, banned
+  pw_hash bytea not null, pw_salt bytea not null, pw_rounds int not null  -- for recovery only; no browser role can read it
 );
 
 create table characters (
   id text primary key,                         -- the id the DO uses
-  user_id uuid not null references profiles on delete cascade,
+  username citext not null references accounts on delete cascade,
   name text unique not null, gender text not null, body text not null,
   created_at timestamptz not null default now(),
   deleted_at timestamptz,
   summary jsonb not null default '{}'          -- day, gold, rank, place (the list screen)
 );
-create index on characters (user_id) where deleted_at is null;
+create index on characters (username) where deleted_at is null;
 
 create table saves_current (                    -- read model, ≤ 30 s behind the DO
   character_id text primary key references characters on delete cascade,
@@ -176,8 +191,8 @@ create table world_history (                    -- the jianghu's past: deaths, s
 );
 create index on world_history (npc_id, world_day);
 
-create table friendships (a uuid, b uuid, since timestamptz, primary key (a, b));
-create table mail (id text primary key, to_user uuid, from_user uuid, sent_at timestamptz,
+create table friendships (a citext, b citext, since timestamptz, primary key (a, b));
+create table mail (id text primary key, to_user citext, from_user citext, sent_at timestamptz,
                    body text, parcel jsonb, state text);   -- read model of the hubs
 create index on mail (to_user, sent_at desc);
 
@@ -228,7 +243,7 @@ Targets for a player in Bangkok on 4G, measured with `Server-Timing` headers and
 | Game interactive (returning, cached) | < 1.5 s | service worker + hashed files, first data group only |
 | Game interactive (first visit) | < 4 s | ~350 KB script + first data group + home map |
 | Map change (new region) | < 300 ms | region data and map prefetched by the roads |
-| Save acknowledged | < 60 ms | JWT in memory → DO local write |
+| Save acknowledged | < 60 ms | token checked in memory → DO local write |
 | World update after a change | < 2 s | push `world_rev` → edge-cached document |
 | Another player's step seen | < 150 ms | room tick 100 ms + socket |
 | Battle verdict | < 300 ms | DO replay of the last commands only |
@@ -238,11 +253,9 @@ Targets for a player in Bangkok on 4G, measured with `Server-Timing` headers and
 
 **Load on the hot spot:** the `WorldObject` today takes 1,000 requests a minute at 1,000 players (each advancing the world first); after §5 it takes the hourly alarm, echoes and killings only.
 
-## 9. Cost notes (check current prices before committing)
+## 9. Plans
 
-- **Cloudflare:** the Workers Paid plan gives the CPU time long replays want and the higher Queue and Durable Object limits; Durable Objects with SQLite, R2 (no egress fees) and Workers Static Assets are cheap at this size. Hyperdrive is included with Workers.
-- **Supabase:** Pro for PITR and no pausing; compute can stay at the smallest size because the database only takes batched writes and a few cached queries.
-- **Vercel:** no longer needed.
+Budget is not a constraint (decision 4), so the design uses what performs best: **Workers Paid** (CPU time for long replays, Queues, higher Durable Object limits, Smart Placement, Hyperdrive), **R2** behind the CDN, and **Supabase Pro** in Singapore with point-in-time recovery; Supabase compute can start at the smallest size because the database only takes batched writes and a few cached queries, and grows without touching the game. Vercel is no longer needed.
 
 ## 10. The migration, in shippable steps
 
@@ -254,19 +267,23 @@ Each step ships alone and is measured before the next.
 | 1 | Static export on Workers Static Assets; `public/` to R2 with hashed names; PNG → WebP; atlases; service worker precache by region | the first load (largest win), Vercel gone |
 | 2 | Game tables out of the JS bundle into hashed JSON, loaded by group (client and server) | script 1.3 MB → ~350 KB; faster server cold starts |
 | 3 | World by revision from the edge cache; `world_rev` pushed on the hub socket; pins via the hub; clock from `pong` | removes the global hot spot |
-| 4 | Supabase project (Singapore), schema, Hyperdrive, the `sync` Queue and Sync Worker; outboxes in `AccountObject` / `BattleObject` / hubs | the record, leaderboards, audit, backups |
-| 5 | Supabase Auth; JWT verified in the isolate; socket tickets; `KeyObject` retired | no auth hop; real accounts (e-mail / OAuth later) |
+| 4 | **Server reset (`DATA_EPOCH` 5).** Supabase project (Singapore), schema, Hyperdrive, the `sync` Queue and Sync Worker; outboxes (Rust crate + TS twin) in every object that feeds Postgres | the record, leaderboards, audit, backups |
+| 5 | Self-describing tokens verified in the isolate by both halves; socket tickets; edge rate limits | no auth hop on any request |
 | 6 | `CharacterObject` per character; delta + gzip saves | smaller, more parallel saves |
 | 7 | Room ticks, server-side move bucket, interest management | realtime that scales per room |
 | 8 | Leaderboards, find-a-player, admin views; daily snapshots in R2 | features on the new data |
 
-**Existing data.** Steps 4–6 change where accounts live. Two ways: start a **new data generation** (`DATA_EPOCH` 5; everyone signs up again — how generations 1–3 were left), or a one-off **export route** on the old Worker that walks every account and writes it to Supabase, after which step 5 creates the matching `auth.users`. The project has reset the server three times already; a reset is the cheaper choice while players are few.
+**Existing data: reset** (decision 3). Step 4 raises `DATA_EPOCH` to 5: everyone signs up again on the new server, as with generations 1–3. No export route.
 
 **What does not change:** the engines (`lib/game`, `lib/world`) and their tests, the seeded battle replay, the save format and its version, and the browser-only mode used by `bun dev` and the test suites.
 
-## Open decisions
+## Decisions
 
-1. **Usernames with Supabase Auth** (synthetic e-mails), or keep the Worker's own username accounts and use Supabase for data only? The first gives e-mail / OAuth / LINE later; the second changes nothing for players today.
-2. **Keep the Rust half?** It holds the room, account and save-check logic with its tests. The plan keeps it; folding it into TypeScript would remove the wasm start-up and one language, at the cost of a rewrite.
-3. **Reset or migrate** existing accounts (above).
-4. **Budget:** Workers Paid ($5/month and usage) + Supabase Pro ($25/month and compute) are the baseline of this design.
+Made by the owner on 2026-10-14:
+
+| # | Question | Decision |
+| --- | --- | --- |
+| 1 | Accounts | **Own username + password** (as today) — `AccountObject` is the authority, mirrored to Postgres; Supabase Auth maybe later |
+| 2 | The Rust half | **Kept, for the realtime and the event-sourced core**: rooms, accounts, characters and saves, the outbox; TypeScript keeps what runs the game's engines |
+| 3 | Existing accounts | **Reset** (`DATA_EPOCH` 5 at step 4) |
+| 4 | Budget | **Not a constraint**: Workers Paid, R2, Supabase Pro |
