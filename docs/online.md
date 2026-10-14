@@ -339,7 +339,7 @@ bun run server:deploy                    # wrangler deploy: builds the wasm, bun
 
 The TypeScript half imports the game's engines straight from the repository (`lib/`, `store/world/state.ts`, `store/world/progression.ts`; no npm packages), so the deploy needs the whole checkout, not only `server/worker` — Workers Builds clones it all.
 
-Then set `NEXT_PUBLIC_GAME_SERVER_URL` to the Worker's URL (`https://wuxia-world.<account>.workers.dev`) in Vercel and redeploy the game.
+Then build the game with `NEXT_PUBLIC_GAME_SERVER_URL` set to the Worker's URL (`https://wuxia-world.<account>.workers.dev`) and deploy it ([The game's pages on Cloudflare](#the-games-pages-on-cloudflare)).
 
 **From the Cloudflare dashboard** (Workers Builds, deploying on every push): import the repository as a **Worker**, not a Pages project (Pages cannot host Durable Objects).
 
@@ -359,6 +359,25 @@ No variables or secrets to add: the server makes its own signing key (above), an
 Servers deployed before the key moved into `KeyObject` signed tokens with an `AUTH_SECRET` variable; those tokens stop working once (accounts are untouched), and the `AUTH_SECRET` variable can be deleted. On load, `OnlineBridge` checks a saved token (`checkToken` → `GET /auth/me`); on a 401 it signs out, so the player lands on the log-in step with the name filled in instead of a room that keeps refusing them.
 
 Durable Objects with SQLite storage are on the Workers free plan. PBKDF2 at 10,000 rounds stays within the free plan's CPU budget per request; raise `PBKDF2_ITERATIONS` on a paid plan.
+
+## The game's pages on Cloudflare
+
+The game itself (pages, art, maps, audio) is a static site served by a second, assets-only Worker (`site/wrangler.jsonc`, `wuxia-world-site`) — step 1 of [design/cloud-architecture.md](design/cloud-architecture.md):
+
+```bash
+NEXT_PUBLIC_GAME_SERVER_URL=https://wuxia-world.<account>.workers.dev bun run site:deploy   # STATIC_EXPORT=1 next build → out/, then wrangler deploy
+bun run site:build && bun run site:preview                                                 # the same locally (wrangler dev on :3018)
+```
+
+- `STATIC_EXPORT=1` makes `next build` write `out/` (`output: "export"`). The map editor's file writer (`app/game/engine/api/save/route.dev.ts`) is left out of that build (`pageExtensions`), so the deployed editor offers downloads; `bun dev` and `next start` still have it.
+- Caching is `public/_headers` (copied into `out/`): `/_next/static/*` a year, immutable; art, maps, sprites, icons, audio a day then revalidated by ETag; `/sw.js` never cached.
+- Unknown paths answer `out/404.html` with a 404.
+- **Dashboard (Workers Builds):** a second Worker from the same repository, root directory `/`, build command `bun install && STATIC_EXPORT=1 NEXT_PUBLIC_GAME_SERVER_URL=<server URL> bun x next build`, deploy command `npx wrangler deploy --config site/wrangler.jsonc`. The service worker's build id comes from `WORKERS_CI_COMMIT_SHA` there (`VERCEL_GIT_COMMIT_SHA` on Vercel).
+
+## Measuring (`Server-Timing`, `/rum`)
+
+- Every HTTP answer of the game server carries `Server-Timing: total;dur=…` (and `auth;dur=…` where the token was checked), readable from the game's origin (`Timing-Allow-Origin`, `Access-Control-Expose-Headers`); `server/worker/ts/timing.ts`.
+- With a server set, the browser sends one beacon per visit when the page is hidden (`lib/net/rum.ts`, `POST /rum`, `text/plain` so no preflight): the build, the connection type, time to first byte, first paint, DOM ready, load, **the first map drawn** (`performance.mark("wuxia:world-ready")`), script bytes and how many came from cache, and each server route's count / average / worst round trip (ids folded: `PUT /characters/:id/save`). The server writes it to Workers Analytics Engine (`RUM` binding, dataset `wuxia_rum`; country from Cloudflare); unbound (`wrangler dev`) it is dropped. Query it with the Analytics Engine SQL API, e.g. `SELECT quantileWeighted(0.75)(double5, _sample_interval) FROM wuxia_rum WHERE double5 >= 0` for the p75 time to the first map.
 
 ## Tests
 

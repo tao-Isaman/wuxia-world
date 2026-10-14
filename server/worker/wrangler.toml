@@ -71,6 +71,11 @@ new_sqlite_classes = ["PlayerHub", "PartyObject"]
 tag = "v5"
 new_sqlite_classes = ["RaidObject"]
 
+# The browsers' timings (POST /rum, server/worker/ts/timing.ts): one data point per visit.
+[[analytics_engine_datasets]]
+binding = "RUM"
+dataset = "wuxia_rum"
+
 [vars]
 # PBKDF2 rounds for new passwords (Workers bill CPU time; raise on a paid plan).
 PBKDF2_ITERATIONS = "10000"

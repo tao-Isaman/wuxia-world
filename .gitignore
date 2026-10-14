@@ -39,4 +39,5 @@ review/**/*.zip
 server/target/
 server/worker/build/
 server/worker/.wrangler/
+.wrangler/
 server/worker/.dev.vars

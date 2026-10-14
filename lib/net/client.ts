@@ -3,6 +3,7 @@
 // (lib/net/session.ts) and the server test (scripts/test-online-server.ts)
 // both use it.
 import { PROTOCOL_VERSION, type ClientMsg, type HeroBody, type Look, type Motion, type ServerMsg, type Session } from "./protocol";
+import { recordApiTiming } from "./rum";
 import type { Dir8 } from "@/lib/characters/walk8";
 import type { BattleLogRequest, BattleStartReply, BattleVerdict, EchoRequest, WorldReply } from "./play-protocol";
 import type { Parcel, SendMailRequest, SocialSnapshot } from "./social-protocol";
@@ -72,6 +73,7 @@ export interface SaveBlob {
 }
 
 async function call<T>(server: string, token: string, method: string, path: string, body?: unknown, keepalive = false): Promise<T> {
+  const began = performance.now();
   const response = await fetch(`${server.replace(/\/$/, "")}${path}`, {
     method,
     headers: { authorization: `Bearer ${token}`, ...(body === undefined ? {} : { "content-type": "application/json" }) },
@@ -79,6 +81,7 @@ async function call<T>(server: string, token: string, method: string, path: stri
     keepalive,
   });
   const reply = await response.json().catch(() => ({ error: "server_error" })) as T & { error?: string; detail?: string };
+  recordApiTiming(`${method} ${path}`, performance.now() - began);
   if (!response.ok) throw new ApiFailure(reply.error ?? "server_error", response.status, reply.detail ?? undefined);
   return reply;
 }

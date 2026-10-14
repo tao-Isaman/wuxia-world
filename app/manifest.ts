@@ -1,5 +1,8 @@
 import type { MetadataRoute } from "next";
 
+// The same for every visitor: written once at build time (also for the static export).
+export const dynamic = "force-static";
+
 // Installable game: full screen on Android, standalone on iOS (which ignores
 // "fullscreen"). Landscape only: a phone held upright shows the game turned on its side.
 export default function manifest(): MetadataRoute.Manifest {

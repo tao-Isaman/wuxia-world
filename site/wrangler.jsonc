@@ -1,0 +1,13 @@
+// The game's pages and art on Cloudflare (docs/design/cloud-architecture.md §1):
+// an assets-only Worker serving the static export (`bun run site:build` → out/).
+// Caching rules: public/_headers (copied into out/). Deploy: `bun run site:deploy`.
+{
+  "name": "wuxia-world-site",
+  "compatibility_date": "2026-01-01",
+  "assets": {
+    "directory": "../out",
+    // Unknown paths get out/404.html with a 404 status.
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  }
+}

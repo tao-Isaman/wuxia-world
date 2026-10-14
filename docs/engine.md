@@ -22,7 +22,7 @@ The game's own editor: a desktop tool for the asset library, the maps and the sk
 
 ## Saving: dev vs deployed
 
-Saving goes through `saveEngineFile(key, data)` (`lib/engine/save.ts`), which POSTs `{ key, json }` to `/game/engine/api/save` (`app/game/engine/api/save/route.ts`).
+Saving goes through `saveEngineFile(key, data)` (`lib/engine/save.ts`), which POSTs `{ key, json }` to `/game/engine/api/save` (`app/game/engine/api/save/route.dev.ts`).
 
 | Where | `GET /game/engine/api/save` | Saving |
 | --- | --- | --- |
@@ -68,7 +68,7 @@ Places library assets on the 100 painted maps and saves `public/assets/placement
 | File | What |
 | --- | --- |
 | `app/game/engine/page.tsx`, `layout.tsx`, `engine.css` | the route, metadata (`noindex`), styles |
-| `app/game/engine/api/save/route.ts` | GET: writable? · POST: write a whitelisted file (dev only) |
+| `app/game/engine/api/save/route.dev.ts` | GET: writable? · POST: write a whitelisted file (dev only) |
 | `components/engine/engine-app.tsx` | tabs, save-mode chip, manifest + edits state, notices |
 | `components/engine/asset-library.tsx`, `asset-detail.tsx`, `labels.ts` | the asset library |
 | `components/engine/map-editor.tsx` | the map editor (map team) |

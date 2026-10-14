@@ -5,6 +5,7 @@ import { characterLook } from "@/lib/world/appearance";
 import type { Presence } from "@/lib/net/protocol";
 import { markerCategory, type OnlinePort, type RemotePlayer, type WorldMarker, type WorldMarkerCategory, type WorldPresentation, type WorldRuntime } from "@/lib/stage/types";
 import { onlineSession } from "@/lib/net/session";
+import { markWorldReady } from "@/lib/net/rum";
 import { useSocialStore } from "@/store/social-store";
 import { TouchStick } from "./touch-stick";
 import { useWorldStore } from "@/store/world-store";
@@ -62,7 +63,7 @@ export function WorldCanvas({ presentation }: { presentation: WorldPresentation 
     void import("@/lib/stage/world-runtime").then(({ createWorldRuntime }) => {
       if (disposed || !host.current) return;
       instance = createWorldRuntime(host.current, () => latest.current,
-        () => { if (!disposed) setReady(true); },
+        () => { if (!disposed) { setReady(true); markWorldReady(); } },
         (message) => { if (!disposed) { setReady(false); setError(message); } },
         (id) => { if (!disposed) setNearby(id); },
         (pickSpot) => { if (!disposed) useWorldStore.getState().walkTick(pickSpot); });

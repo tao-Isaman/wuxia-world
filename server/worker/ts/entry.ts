@@ -12,12 +12,15 @@
 //   POST /social/<action> · /party/<action>    friends, whispers, mail, the party
 //   GET  /raid/<bossId>[?from=N]               a world boss and the player's fight for it (RaidObject)
 //   POST /raid/<bossId>/open|join|start|act    open a party fight, join it, begin it, play a turn
+//   POST /rum                                  the browsers' timings (Analytics Engine; lib/net/rum.ts)
+// Every HTTP answer carries Server-Timing (total, and the token check).
 import { WorkerEntrypoint } from "cloudflare:workers";
 import RustWorker, { AccountObject, KeyObject, RoomObject } from "wuxia-rust";
 import { accountObjectName, battleObjectName, hubObjectName, raidObjectName, WORLD_OBJECT_NAME, type Env } from "./env";
 import { getBoss } from "@/lib/world/data/bosses";
 import type { PartyView } from "@/lib/net/social-protocol";
 import { callObject, json, readJson, withCors } from "./http";
+import { handleRum, withTiming, type Timings } from "./timing";
 
 export { AccountObject, KeyObject, RoomObject };
 export { WorldObject } from "./world-object";
@@ -46,17 +49,26 @@ export default class GameServer extends WorkerEntrypoint<Env> {
   }
 
   /** The account a token belongs to (the Rust half checks it), or null. */
-  private async player(request: Request, url: URL): Promise<string | null> {
+  private async player(request: Request, url: URL, timings: Timings): Promise<string | null> {
     const token = tokenOf(request, url);
     if (!token) return null;
+    const began = Date.now();
     const reply = await this.rust().fetch(new Request(`${url.origin}/auth/me?token=${encodeURIComponent(token)}`));
+    timings.auth = Date.now() - began;
     if (!reply.ok) return null;
     const me = await reply.json().catch(() => null) as { username?: string } | null;
     return typeof me?.username === "string" ? me.username : null;
   }
 
   async fetch(request: Request): Promise<Response> {
+    const began = Date.now();
+    const timings: Timings = {};
+    return withTiming(await this.route(request, timings), began, timings);
+  }
+
+  private async route(request: Request, timings: Timings): Promise<Response> {
     const url = new URL(request.url);
+    if (url.pathname === "/rum" && request.method === "POST") return handleRum(request, this.env);
     const parts = url.pathname.split("/").filter(Boolean);
     const isWorld = parts[0] === "world" && (parts.length === 1 ? request.method === "GET" : parts.length === 2 && parts[1] === "echo" && request.method === "POST");
     const isBattle = parts[0] === "characters" && parts.length === 4 && parts[2] === "battle" && request.method === "POST"
@@ -65,7 +77,7 @@ export default class GameServer extends WorkerEntrypoint<Env> {
     const isRaid = parts[0] === "raid" && !!getBoss(parts[1]) && (parts.length === 2 ? request.method === "GET"
       : parts.length === 3 && request.method === "POST" && ["open", "join", "start", "act"].includes(parts[2]!));
     if (!isWorld && !isBattle && !social && !isRaid) return this.rust().fetch(request);
-    const player = await this.player(request, url);
+    const player = await this.player(request, url, timings);
     if (!player) return withCors(json({ error: "bad_token" }, 401));
     try {
       // A socket upgrade goes back as it is (CORS headers do not apply).

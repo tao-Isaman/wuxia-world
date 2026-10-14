@@ -6,6 +6,12 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-14
 
+### Cloudflare step 0–1a: measuring, and the game as a static site
+
+- **Decisions** recorded in [design/cloud-architecture.md](design/cloud-architecture.md): own username + password accounts, Rust for the realtime and event-sourced core, a reset at the Supabase step, budget no constraint.
+- **Measuring:** every server answer carries `Server-Timing` (total, the token check); browsers send one `/rum` beacon per visit (time to the first map, first paint, script bytes, each route's round trips) into Workers Analytics Engine (`RUM`). `test:play-server` covers both.
+- **Static site:** `bun run site:build` (`STATIC_EXPORT=1`) writes the game to `out/`; `site/wrangler.jsonc` serves it as an assets-only Worker with `public/_headers` cache rules; the editor's file writer became `route.dev.ts` (not in the export; the engine downloads instead). The game, PWA and editor e2e specs pass against it under `wrangler dev`.
+
 ### Design: everything on Cloudflare + Supabase
 
 - [design/cloud-architecture.md](design/cloud-architecture.md) (proposal, nothing built): the game and its art served by Cloudflare (static export, R2, hashed files, the 6.8 MB data chunk split into JSON), Supabase Auth checked at the edge, the Durable Objects kept as the hot authority with an outbox → Queue → Hyperdrive pipeline into Postgres (saves, ledger, battles, world history, leaderboards), the world served by revision from the edge cache instead of a poll of one object, delta saves, room ticks; budgets and a step-by-step migration.

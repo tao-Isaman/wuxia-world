@@ -1,0 +1,39 @@
+# Cache rules for the static export on Cloudflare (Workers Static Assets reads
+# this file; docs/design/cloud-architecture.md §1). `next start` serves it as a
+# plain file and ignores it.
+
+# The service worker must always be fresh.
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# Next's own files are named by their content: cache for a year.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Art, maps, sprites, icons, audio, fonts: not yet named by content (step 1b),
+# so a day in caches, then revalidated by ETag (a 304 costs no body).
+/art/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/maps/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/npcs/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/player/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/foes/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/icons/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/assets/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/audio/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/fonts/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/pwa/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+# Every page: the usual hardening.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin

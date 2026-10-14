@@ -10,6 +10,8 @@ export interface Env {
   PARTIES: DurableObjectNamespace;
   RAIDS: DurableObjectNamespace;
   PBKDF2_ITERATIONS?: string;
+  /** Workers Analytics Engine dataset for the browsers' measurements (POST /rum); unbound in `wrangler dev`. */
+  RUM?: { writeDataPoint(point: { blobs?: string[]; doubles?: number[]; indexes?: string[] }): void };
 }
 
 /**

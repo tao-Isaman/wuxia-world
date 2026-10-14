@@ -1,5 +1,5 @@
 /**
- * The save route's rules (app/game/engine/api/save/route.ts), kept pure so
+ * The save route's rules (app/game/engine/api/save/route.dev.ts), kept pure so
  * scripts/test-engine.ts can check them: when the server may write, and which
  * request bodies it accepts (only the whitelisted engine files).
  */

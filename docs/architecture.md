@@ -28,7 +28,7 @@ How the code is laid out, which layer may import which, how state flows, and whe
 | Audio | Web Audio API, all procedural |
 | Runtime | Bun for scripts and tests; Node 20+ works for Next |
 | Tests | Bun scripts, `bun test` for two files, Playwright (Chromium) |
-| Deploy | Vercel is implied (`VERCEL_GIT_COMMIT_SHA` in `next.config.ts`); there is no CI config in the repo |
+| Deploy | moving to Cloudflare ([design/cloud-architecture.md](design/cloud-architecture.md)): the game as a static export on an assets-only Worker (`bun run site:deploy`, [online.md](online.md#the-games-pages-on-cloudflare)), the server as its own Worker; Vercel still works (`VERCEL_GIT_COMMIT_SHA` / `WORKERS_CI_COMMIT_SHA` in `next.config.ts`); no CI config in the repo |
 
 ## Layers
 

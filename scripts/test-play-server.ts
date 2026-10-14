@@ -581,6 +581,35 @@ await check("the server's TypeScript half bundles from the repository alone (no 
   assert.deepEqual([...packages], []);
 });
 
+await check("timing: Server-Timing on answers (not on socket upgrades); a RUM beacon becomes one data point, junk is refused", async () => {
+  const { withTiming, rumPoint, handleRum } = await import("../server/worker/ts/timing");
+  const timed = withTiming(new Response("{}", { status: 201 }), Date.now() - 5, { auth: 2 });
+  assert.equal(timed.status, 201);
+  assert.match(timed.headers.get("Server-Timing") ?? "", /^total;dur=\d+, auth;dur=2$/);
+  assert.equal(timed.headers.get("Timing-Allow-Origin"), "*");
+  const upgrade = { status: 101, headers: new Headers() } as unknown as Response;
+  assert.equal(withTiming(upgrade, Date.now()), upgrade);
+  const point = rumPoint({ build: "abc", conn: "4g", ttfb: 120, worldReady: 2300, jsBytes: -3, api: { "GET /world": { n: 1, avg: 40, max: 40 } } }, "TH");
+  assert.deepEqual(point?.indexes, ["abc"]);
+  assert.deepEqual(point?.blobs.slice(0, 3), ["abc", "4g", "TH"]);
+  assert.deepEqual(point?.doubles, [120, -1, -1, -1, 2300, -1, -1]);
+  assert.equal(rumPoint("nope", ""), null);
+  const written: unknown[] = [];
+  const env = { RUM: { writeDataPoint: (p: unknown) => written.push(p) } } as never;
+  assert.equal((await handleRum(new Request("https://x/rum", { method: "POST", body: JSON.stringify({ build: "b", ttfb: 1 }) }), env)).status, 204);
+  assert.equal((await handleRum(new Request("https://x/rum", { method: "POST", body: "not json" }), env)).status, 400);
+  assert.equal(written.length, 1);
+  // The browser side folds ids out of the routes it reports.
+  const { recordApiTiming, collectRum } = await import("../lib/net/rum");
+  recordApiTiming("PUT /characters/c123/save", 30);
+  recordApiTiming("PUT /characters/c999/save", 50);
+  const fakePerf = { getEntriesByType: () => [], getEntriesByName: () => [] } as unknown as Performance;
+  Object.defineProperty(globalThis, "navigator", { configurable: true, value: {} });
+  const rum = collectRum(fakePerf) as { api: Record<string, { n: number; avg: number; max: number }>; worldReady: number | null };
+  assert.deepEqual(rum.api["PUT /characters/:id/save"], { n: 2, avg: 40, max: 50 });
+  assert.equal(rum.worldReady, null);
+});
+
 if (failed) {
   console.error(`${failed} play-server check(s) failed`);
   process.exit(1);

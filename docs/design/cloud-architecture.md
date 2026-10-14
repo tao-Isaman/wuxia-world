@@ -1,6 +1,6 @@
 # Cloud architecture: Cloudflare + Supabase — design
 
-> **Status: decided 2026-10-14; step 0–1 in progress ([§10](#10-the-migration-in-shippable-steps)).** Today the game is served by Vercel, the online server is one Cloudflare Worker whose Durable Objects keep everything ([online.md](../online.md)), and without a server the save lives in the browser. This page designs the move of **everything** onto Cloudflare and Supabase, with performance as the first concern. The owner's decisions are at the end ([Decisions](#decisions)): own username + password accounts, Rust for the realtime and event-sourced core, a server reset, budget no constraint.
+> **Status: decided 2026-10-14. Built: step 0 and step 1a ([§10](#10-the-migration-in-shippable-steps)).** Today the game is served by Vercel, the online server is one Cloudflare Worker whose Durable Objects keep everything ([online.md](../online.md)), and without a server the save lives in the browser. This page designs the move of **everything** onto Cloudflare and Supabase, with performance as the first concern. The owner's decisions are at the end ([Decisions](#decisions)): own username + password accounts, Rust for the realtime and event-sourced core, a server reset, budget no constraint.
 
 ## Goals
 
@@ -263,8 +263,9 @@ Each step ships alone and is measured before the next.
 
 | # | Step | Gain |
 | --- | --- | --- |
-| 0 | `Server-Timing` on every route, a real-user beacon, the bundle report in CI | numbers to compare against |
-| 1 | Static export on Workers Static Assets; `public/` to R2 with hashed names; PNG → WebP; atlases; service worker precache by region | the first load (largest win), Vercel gone |
+| 0 ✅ | `Server-Timing` on every route, a real-user beacon (`/rum` → Analytics Engine) — [online.md](../online.md#measuring-server-timing-rum) | numbers to compare against |
+| 1a ✅ | Static export on Workers Static Assets, cache rules in `_headers` — [online.md](../online.md#the-games-pages-on-cloudflare) | Vercel can go |
+| 1b | `public/` to R2 with hashed names; PNG → WebP; atlases; service worker precache by region | the first load (largest win) |
 | 2 | Game tables out of the JS bundle into hashed JSON, loaded by group (client and server) | script 1.3 MB → ~350 KB; faster server cold starts |
 | 3 | World by revision from the edge cache; `world_rev` pushed on the hub socket; pins via the hub; clock from `pong` | removes the global hot spot |
 | 4 | **Server reset (`DATA_EPOCH` 5).** Supabase project (Singapore), schema, Hyperdrive, the `sync` Queue and Sync Worker; outboxes (Rust crate + TS twin) in every object that feeds Postgres | the record, leaderboards, audit, backups |
