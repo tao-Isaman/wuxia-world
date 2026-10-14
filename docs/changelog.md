@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-14
 
+### Design: everything on Cloudflare + Supabase
+
+- [design/cloud-architecture.md](design/cloud-architecture.md) (proposal, nothing built): the game and its art served by Cloudflare (static export, R2, hashed files, the 6.8 MB data chunk split into JSON), Supabase Auth checked at the edge, the Durable Objects kept as the hot authority with an outbox → Queue → Hyperdrive pipeline into Postgres (saves, ledger, battles, world history, leaderboards), the world served by revision from the edge cache instead of a poll of one object, delta saves, room ticks; budgets and a step-by-step migration.
+
 ### The profile's gear tab reads, and every stat says what it does
 
 - **อุปกรณ์ tab** (`profile-popup.tsx`): each slot card squeezed four lines (slot, name, stats, options) into a fifth of the column, so on a phone only the Thai tone marks showed. Now the ten slots are one-line buttons (name, ✦ option count) and below them sits one table: everything worn, summed, or the tapped piece — its base stats, ⚒ enhancement and ✦ options — one name | number row each.

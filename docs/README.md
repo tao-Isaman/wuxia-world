@@ -68,6 +68,7 @@ Start with the [project README](../README.md) for what the game is and how to ru
 - [specs/sect-template.md](specs/sect-template.md) — a fill-in sheet for designing a new sect.
 - [specs/shaolin-sheet.md](specs/shaolin-sheet.md) — the sheet filled in for วัดเส้าหลิน, as a worked example.
 - [specs/location-concepts.md](specs/location-concepts.md) — the original location concept list with Chinese names and notes.
+- [design/cloud-architecture.md](design/cloud-architecture.md) — proposal: everything on Cloudflare + Supabase, performance first (who owns what, the edge cache, the sync pipeline, the schema, the migration steps).
 
 **Elsewhere in the repo:**
 
