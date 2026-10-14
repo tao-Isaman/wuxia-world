@@ -9,13 +9,20 @@ import {
   STAT_BUDGET,
   STAT_KEYS,
   STAT_LABEL,
+  DERIVED_HINT,
   WEAPON_FAMILY_HINT,
   WEAPON_FAMILY_LABEL,
+  affixQuality,
+  affixText,
+  derivedSourceParts,
+  enhanceParts,
+  gearTierLabel,
+  parseGear,
+  statFeedParts,
   bpMultiplier,
   combinedStats,
   derive,
   deriveAll,
-  getEquip,
   gearFamilyMods,
   gearName,
   equipBonusParts,
@@ -31,7 +38,6 @@ import {
 } from "@/lib/game";
 import { InfoPopover } from "@/components/ui/wuxia/info-popover";
 import type { EquipSlotType, WeaponFamily } from "@/lib/game";
-import { GearAffixLine } from "@/components/game/gear-affixes";
 import { useWorldStore } from "@/store/world-store";
 import { PowerTierBadge } from "@/components/world/power-tier-badge";
 import { xpToNextStatLevel } from "@/lib/world/stat-progression";
@@ -78,9 +84,14 @@ const EQUIP_ROWS: readonly EquipSlotRow[] = [
   { type: "C",  label: `🎖 ${SLOT_LABELS.C} 2`,  index: 1 },
 ];
 
-function describeEquip(id: string | null): string {
-  const e = id ? getEquip(id) : undefined;
-  return e ? equipStatParts(e).join(" · ") : "";
+/** "พลังโจมตี +14" → the name and its number apart, so a list reads as a table
+ *  ("กระบวนท่าสายกระบี่ แรงขึ้น 15%" → "กระบวนท่าสายกระบี่" | "+15%"). */
+function statPart(part: string) {
+  const worded = part.match(/^(.*) (แรงขึ้น|เบาลง) (\d[\d.]*%)$/);
+  if (worded) return <><span>{worded[1]}</span><b>{worded[2] === "เบาลง" ? "−" : "+"}{worded[3]}</b></>;
+  const at = part.search(/ [+\-−]?\d[\d.,]*%?(?: |$)/);
+  if (at < 0) return <span>{part}</span>;
+  return <><span>{part.slice(0, at)}</span><b>{part.slice(at + 1)}</b></>;
 }
 
 // Profile — a read-only character sheet in three landscape columns:
@@ -102,6 +113,8 @@ export function ProfilePopup({ open, onClose }: Props) {
   const stamina = useWorldStore((s) => s.stamina);
   const staminaMax = useWorldStore((s) => s.staminaMax);
   const [tab, setTab] = useState<ProfileTab>("stats");
+  // The gear tab's picked slot ("BR-1"…); none shows everything worn, summed.
+  const [gearPick, setGearPick] = useState<string | null>(null);
   if (!player) return null;
 
   const base = player.stats;
@@ -112,6 +125,8 @@ export function ProfilePopup({ open, onClose }: Props) {
   const breakdown = statBreakdown(player);
   const derivedAll = deriveAll(player);
   const derivedBase = derive(base);
+  // Stats alone (with moves, arts and meridians), before gear and flat bonuses.
+  const derivedStats = derive(combined);
   // Power tier: stats + inner arts + moves, never equipment (lib/game/power-tier.ts).
   const powerTier = powerTierOf(powerBreakdown(player).total);
 
@@ -144,6 +159,11 @@ export function ProfilePopup({ open, onClose }: Props) {
     ...Object.entries(fam.dmg).map(([f, v]) => `กระบวนท่าสาย${WEAPON_FAMILY_LABEL[f as WeaponFamily]} แรงขึ้น ${v}%`),
     ...Object.entries(fam.red).map(([f, v]) => `รับกระบวนท่าสาย${WEAPON_FAMILY_LABEL[f as WeaponFamily]} เบาลง ${v}%`),
   ];
+
+  const slotId = (row: EquipSlotRow) => {
+    const slot = player.equipment[row.type];
+    return Array.isArray(slot) ? slot[row.index ?? 0] : slot;
+  };
 
   const staminaPct = staminaMax > 0 ? Math.min(100, (stamina / staminaMax) * 100) : 0;
   const hpNow = Math.min(currentHp, derivedAll.HP), mpNow = Math.min(currentMp, derivedAll.MP);
@@ -232,6 +252,7 @@ export function ProfilePopup({ open, onClose }: Props) {
                         <li className="flex justify-between"><span className="text-muted-foreground">ชีพจร</span><span className="font-mono">{fromMeridians > 0 ? `+${fromMeridians}` : fromMeridians}</span></li>
                         <li className="flex justify-between"><span className="text-muted-foreground">อุปกรณ์</span><span className="font-mono">{fromEquipment > 0 ? `+${fromEquipment}` : fromEquipment}</span></li>
                       </ul>
+                      <p className="profile-feeds"><b>ทุก 1 แต้ม เพิ่ม</b> {statFeedParts(k).join(" · ")}</p>
                       <div className="border-t pt-1.5 space-y-0.5 text-xs">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">เกณฑ์เรียนตำรา</span>
@@ -247,22 +268,69 @@ export function ProfilePopup({ open, onClose }: Props) {
           )}
           {tab === "gear" && (
             <div className="profile-gear" role="tabpanel" aria-label="อุปกรณ์">
-              <ul>
+              <ul className="profile-gear-slots">
                 {EQUIP_ROWS.map((row) => {
-                  const slot = player.equipment[row.type];
-                  const id = Array.isArray(slot) ? slot[row.index ?? 0] : slot;
-                  const e = getEquip(id);
+                  const rowKey = `${row.type}-${row.index ?? "x"}`;
+                  const id = slotId(row);
+                  const g = parseGear(id);
                   return (
-                    <li key={`${row.type}-${row.index ?? "x"}`}>
-                      <span className="profile-gear-slot">{row.label}</span>
-                      <span className="profile-gear-name">{e ? gearName(id) : <i>— ว่าง —</i>}</span>
-                      {e && <small>{describeEquip(id)}</small>}
-                      {e && <GearAffixLine gearKey={id} />}
+                    <li key={rowKey}>
+                      <button
+                        type="button"
+                        aria-pressed={gearPick === rowKey}
+                        disabled={!g}
+                        title={row.label}
+                        data-gear-slot={rowKey}
+                        onClick={() => setGearPick((p) => (p === rowKey ? null : rowKey))}
+                      >
+                        <span className="profile-gear-icon" aria-hidden>{row.label.split(" ")[0]}</span>
+                        <span className="sr-only">{row.label.slice(row.label.indexOf(" ") + 1)}: </span>
+                        <span className="profile-gear-name">{g ? gearName(id) : <i>— ว่าง —</i>}</span>
+                        {g && g.affixes.length > 0 && <small className="profile-gear-count">✦{g.affixes.length}</small>}
+                      </button>
                     </li>
                   );
                 })}
               </ul>
-              <p className="profile-gear-total">รวม: {equipSummary.length > 0 ? equipSummary.join(" · ") : "ไม่มีโบนัส"}</p>
+              {(() => {
+                const row = EQUIP_ROWS.find((r) => `${r.type}-${r.index ?? "x"}` === gearPick);
+                const id = row ? slotId(row) : null;
+                const g = parseGear(id);
+                if (!row || !g) {
+                  return (
+                    <div className="profile-gear-detail" data-testid="gear-total">
+                      <p className="profile-gear-head"><b>รวมจากอุปกรณ์ที่สวม</b><small>แตะชิ้นใดเพื่อดูรายละเอียด</small></p>
+                      {equipSummary.length > 0 ? (
+                        <ul className="profile-gear-parts">{equipSummary.map((part) => <li key={part}>{statPart(part)}</li>)}</ul>
+                      ) : <p className="profile-gear-none">ยังไม่ได้สวมอุปกรณ์</p>}
+                    </div>
+                  );
+                }
+                const e = g.def;
+                return (
+                  <div className="profile-gear-detail" data-testid="gear-piece">
+                    <p className="profile-gear-head">
+                      <b>{gearName(id)}</b>
+                      <small>{row.label.slice(row.label.indexOf(" ") + 1)} · ชั้น{gearTierLabel(e.ti)}{e.fam ? ` · สาย${WEAPON_FAMILY_LABEL[e.fam]}` : ""}</small>
+                      <button type="button" className="profile-gear-back" aria-label="ดูผลรวม" title="ดูผลรวม" onClick={() => setGearPick(null)}>✕</button>
+                    </p>
+                    <p className="profile-gear-sub">ค่าพื้นฐาน</p>
+                    <ul className="profile-gear-parts">{equipStatParts(e).map((part) => <li key={part}>{statPart(part)}</li>)}</ul>
+                    {g.enhance > 0 && (
+                      <>
+                        <p className="profile-gear-sub">⚒ เสริมพลัง +{g.enhance}</p>
+                        <ul className="profile-gear-parts">{enhanceParts(e.ty, g.enhance).map((part) => <li key={part}>{statPart(part)}</li>)}</ul>
+                      </>
+                    )}
+                    <p className="profile-gear-sub">✦ ออฟชั่นเสริม</p>
+                    {g.affixes.length > 0 ? (
+                      <ul className="profile-gear-parts profile-gear-affixes">
+                        {g.affixes.map((a) => <li key={a.k} className={`affix-q${affixQuality(a)}`}>{statPart(affixText(a))}</li>)}
+                      </ul>
+                    ) : <p className="profile-gear-none">ไม่มี</p>}
+                  </div>
+                );
+              })()}
             </div>
           )}
           {tab === "outfit" && <Wardrobe />}
@@ -271,19 +339,34 @@ export function ProfilePopup({ open, onClose }: Props) {
         {/* ─── 3. Detailed status ──────────────────────────────────── */}
         <section className="menu-col profile-status" aria-label="สถานะละเอียด">
           <div className="menu-col-head"><span className="menu-col-title">สถานะละเอียด</span><small className="profile-budget">คะแนนพลัง {totalSpent}/{STAT_BUDGET}</small></div>
-          <dl className="profile-derived">
+          <div className="profile-derived">
             {DERIVED_ROWS.map(({ label, thai, key }) => {
               const cv = derivedAll[key];
               const bv = derivedBase[key as keyof typeof derivedBase] ?? cv;
               const diff = cv - bv;
-              return (
-                <div key={label}>
-                  <dt>{thai}</dt>
-                  <dd>{cv}{diff > 0 && <em>+{diff}</em>}</dd>
+              const fromStats = derivedStats[key as keyof typeof derivedStats] ?? cv;
+              const row = (
+                <div className="profile-derived-row" data-derived={key}>
+                  <span>{thai}</span>
+                  <b>{cv}{diff > 0 && <em>+{diff}</em>}</b>
                 </div>
               );
+              return (
+                <InfoPopover key={label} trigger={row} side="left" contentClassName="w-72">
+                  <div className="profile-explain">
+                    <p className="profile-explain-head"><strong>{thai}</strong><b>{cv}</b></p>
+                    <p>{DERIVED_HINT[key]}</p>
+                    <p className="profile-explain-from"><b>มาจากค่าพลัง</b> {derivedSourceParts(key).join(" · ")}</p>
+                    <ul>
+                      <li><span>จากค่าพลัง (รวมวิชา ชีพจร)</span><b>{fromStats}</b></li>
+                      <li><span>อุปกรณ์และโบนัสอื่น</span><b>{cv - fromStats >= 0 ? `+${cv - fromStats}` : cv - fromStats}</b></li>
+                    </ul>
+                  </div>
+                </InfoPopover>
+              );
             })}
-          </dl>
+          </div>
+          <p className="profile-hint">แตะค่าใดก็ได้เพื่อดูว่าค่านั้นทำอะไร</p>
           <div className="profile-mastery">
             <span className="profile-mastery-label">ความชำนาญ</span>
             {Object.keys(mastery).length === 0 ? <span className="text-muted-foreground">ยังไม่มี</span> : Object.entries(mastery).map(([w, v]) => (

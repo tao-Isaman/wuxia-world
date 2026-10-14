@@ -4,6 +4,13 @@ What changed, when, and in which pull request. Newest first. Each entry says wha
 
 Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-Isaman/wuxia-world/pulls?q=is%3Apr+is%3Amerged). The waves are the build → test → review rounds the agents worked in (see [HANDOFF.md](../HANDOFF.md)).
 
+## 2026-10-14
+
+### The profile's gear tab reads, and every stat says what it does
+
+- **อุปกรณ์ tab** (`profile-popup.tsx`): each slot card squeezed four lines (slot, name, stats, options) into a fifth of the column, so on a phone only the Thai tone marks showed. Now the ten slots are one-line buttons (name, ✦ option count) and below them sits one table: everything worn, summed, or the tapped piece — its base stats, ⚒ enhancement and ✦ options — one name | number row each.
+- **Stat explanations**: tapping a combat stat in สถานะละเอียด tells what it does in a fight (hit, crit, turn gauge, move range…, `DERIVED_HINT`), which base stats make it and how much of it comes from gear; a base stat's card adds what one point of it raises (`statFeedParts`, read off `derive`). `profile-gear.spec.ts` checks both.
+
 ## 2026-10-13
 
 ### A fight is drawn over the place it happens in

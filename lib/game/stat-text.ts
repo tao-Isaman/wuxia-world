@@ -2,8 +2,8 @@
 // player reads is Thai: the tables keep short keys (HP, Atk, PD…), the UI
 // shows these words instead.
 
-import type { Equipment, StatKey } from "./types";
-import type { EquipBonus } from "./derive";
+import { STAT_KEYS, type Derived, type Equipment, type StatBlock, type StatKey } from "./types";
+import { derive, type EquipBonus } from "./derive";
 import { STAT_LABEL } from "./data/stats";
 import { WEAPON_FAMILY_LABEL } from "./data/weapons";
 import { enhanceBonus, gearAffixes, parseGear, type GearAffix, type GearAffixKind } from "./gear";
@@ -24,6 +24,53 @@ export const DERIVED_LABEL = {
   Cri: "คริติคอล",
   Res: "ต้านทาน",
 } as const;
+
+/** What each derived stat does in a fight, in the player's words (the numbers
+ *  follow battle.ts: hit, crit, the turn gauge, move range). */
+export const DERIVED_HINT: Record<keyof Derived, string> = {
+  HP: "เลือดของตัวละคร ลดลงเมื่อถูกโจมตี หมดเมื่อไรก็แพ้",
+  MP: "ปราณที่ใช้ร่ายกระบวนท่าและลมปราณ ท่ายิ่งสูงยิ่งกินปราณมาก",
+  Atk: "แรงพื้นฐานของทุกกระบวนท่า ทั้งภายนอกและภายใน",
+  PA: "เพิ่มความแรงของกระบวนท่าภายนอก (ท่าที่ใช้กำลังกาย อาวุธ หมัดเท้า)",
+  IA: "เพิ่มความแรงของกระบวนท่าภายใน (ท่าที่ใช้ปราณ)",
+  PD: "หักลบความเสียหายจากกระบวนท่าภายนอกของศัตรู",
+  ID: "หักลบความเสียหายจากกระบวนท่าภายในของศัตรู",
+  Spd: "เกจเทิร์นเต็มเร็วขึ้น ได้ลงมือบ่อยขึ้น และเดินบนกระดานได้ไกลขึ้น (3 ช่อง +1 ทุก 80 แต้ม สูงสุด 6)",
+  Eva: "หลบการโจมตี: ทุก 4 แต้มที่เกินความแม่นยำของศัตรู ลดโอกาสถูกตี 1%",
+  Acc: "โจมตีโดน: พื้นฐาน 80% ทุก 4 แต้มที่เกินการหลบหลีกของศัตรู +1% (ต่ำสุด 5% สูงสุด 95%)",
+  Cri: "ติดคริติคอล (แรง ×1.5): 3% + 1% ทุก 3 แต้มที่เกินต้านทานของศัตรู (สูงสุด 75%)",
+  Res: "กันคริติคอล: ทุก 3 แต้ม ลดโอกาสที่ศัตรูจะติดคริติคอลใส่เรา 1%",
+};
+
+/** What one point of each base stat adds to each derived stat, read off
+ *  `derive` itself (probed in its linear range, so it never drifts). */
+export const STAT_FEEDS: Record<StatKey, { key: keyof Derived; per: number }[]> = (() => {
+  const at = (bump?: StatKey): Derived => {
+    const block = Object.fromEntries(STAT_KEYS.map((k) => [k, k === bump ? 120 : 100])) as unknown as StatBlock;
+    return derive(block);
+  };
+  const flat = at();
+  const out = {} as Record<StatKey, { key: keyof Derived; per: number }[]>;
+  for (const k of STAT_KEYS) {
+    const d = at(k);
+    out[k] = (Object.keys(DERIVED_LABEL) as (keyof Derived)[])
+      .map((key) => ({ key, per: (d[key] - flat[key]) / 20 }))
+      .filter((f) => f.per !== 0);
+  }
+  return out;
+})();
+
+const perText = (per: number) => (Number.isInteger(per) ? `${per}` : per.toFixed(1));
+
+/** "พลังชีวิต +3 · พลังโจมตี +3 …": what one point of a base stat raises. */
+export function statFeedParts(k: StatKey): string[] {
+  return STAT_FEEDS[k].map((f) => `${DERIVED_LABEL[f.key]} +${perText(f.per)}`);
+}
+
+/** "กำลัง ×3 · ความเร็ว ×1 …": which base stats a derived stat is made of. */
+export function derivedSourceParts(key: keyof Derived): string[] {
+  return STAT_KEYS.flatMap((k) => STAT_FEEDS[k].filter((f) => f.key === key).map((f) => `${STAT_LABEL[k]} ×${perText(f.per)}`));
+}
 
 const ON_HIT_LABEL: Record<string, string> = {
   debuff_eva: DERIVED_LABEL.Eva,
